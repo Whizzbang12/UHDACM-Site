@@ -2,7 +2,9 @@
   "scripts": {
     "dev": "nodemon --exec \"ts-node ./src/index.ts\"",
     "build": "tsc",
-    "start": "node ./dist"
+    "start": "node ./dist",
+    "chroma-server": "chroma run",
+    "ingestTest": "nodemon --exec \"ts-node ./src/context/context.ts\""
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
@@ -16,7 +18,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "@chroma-core/google-gemini": "^0.1.8",
+    "@chroma-core/default-embed": "^0.1.9",
     "@langchain/google-genai": "^2.1.7",
     "acorn": "^8.15.0",
     "acorn-walk": "^8.3.4",

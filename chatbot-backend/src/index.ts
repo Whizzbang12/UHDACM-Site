@@ -1,7 +1,3 @@
-import { env_vars } from './tools/env/envVars';
-import './langchain/langchain';
-console.log(env_vars.PORT);
-
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 
@@ -14,9 +10,9 @@ type ChatRequestBody = {
 };
 
 app.use(express.json());
-app.use(cors({ origin: FRONTEND_ADDRESS }));
-
 const allowedOrigins = [FRONTEND_ADDRESS];
+app.use(cors({ origin: allowedOrigins }));
+
 
 // app.use((req: Request, res: Response, next) => {
 //   const origin = req.headers.origin;
@@ -28,7 +24,7 @@ const allowedOrigins = [FRONTEND_ADDRESS];
 //   next();
 // });
 
-app.post('/chat', (req: Request<{}, {}, ChatRequestBody>, res: Response) => {
+app.post('/chat', async (req: Request<{}, {}, ChatRequestBody>, res: Response) => {
   const { messages } = req.body;
   if (
     !Array.isArray(messages) ||

@@ -1,0 +1,10 @@
+.chatbot_container {
+  position: fixed;
+  bottom: 2.5rem;
+  right: 2.5rem;
+  /* right: 50%; */
+  /* transform: translateX(calc(var(--page-max-width)/2)); */
+  /* margin-left: min(95vw, --page-max-width); */
+  /* transform: translateX(min(calc(95vw/2), calc(--page-max-width/2))); */
+  /* bottom: 5rem; */
+};

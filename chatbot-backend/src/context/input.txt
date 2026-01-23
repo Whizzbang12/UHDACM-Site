@@ -1,0 +1,30 @@
+ORGANIZATION NAME: UHD ACM (Association for Computing Machinery – University of Houston–Downtown)
+
+TAGLINE: “Rise above the noise — One step at a time”
+
+MISSION / PURPOSE: We empower our students to explore tech, build skills, and connect through hands-on competitions, projects, and a supportive community.
+
+LEADERSHIP / OFFICERS: President - Fatima T., Vice President - Jessica G., VP Administration - Sadman A., VP Finances - Nigel F., VP Marketing - Christian H., VP Logistics - Ana V., Site Manager - Elisa M., Kevin - Kevin M.
+
+EVENTS (Publicly Listed): 
+Event: General Interest Meeting | Date: September 9, 2025 | Time: 8:00 PM – 9:00 PM | Location: ACAD 423 | Description: Join us for our General Meeting to hear about upcoming events, competitions, and ways to get involved with the ACM community at UHD. All are welcome.
+Event: Web Development Workshop | Dates: October 8–9, 2025 | Location: OMB N621 | Description: Hands-on workshop covering HTML, CSS, and JavaScript. Designed for beginners and intermediate participants. Hosted in collaboration with ACM.
+
+MEDIA / CONTENT: 
+QnA Feature - Title: QnA with Alex Serna | Description: An inside look at life as a software engineer featuring UHD alumnus Alex Serna. | Format: Video (YouTube link embedded on site)
+Galleries - Photo and video galleries from ACM events and activities are accessible via the Galleries page.
+Newsletters - Newsletters are linked externally (hosted on Notion).
+
+JOIN / MEMBERSHIP: 
+Discord - Primary platform for updates, announcements, and communication.
+CampusGroups - Official UHD student organization listing and membership management.
+Leadership Applications - External Google Form linked via “Apply Now” on the Join page.
+Note: Most updates and announcements are communicated through Discord.
+
+CONTACT INFORMATION: Contact Page: /contact-us | Method: Web form | Instructions: Users submit their email address and message. Response time stated on site: 24–48 hours.
+
+SITE PAGES IDENTIFIED: /, /about, /events, /events/web-dev-ws, /media, /galleries, /join, /contact-us
+
+ASSETS (Example): ACM UHD Logo (Orange ACM logo image hosted via site CMS)
+
+COPYRIGHT: UHD ACM © 2025 | All rights reserved.
