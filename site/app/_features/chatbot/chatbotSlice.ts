@@ -3,8 +3,8 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 interface ChatbotMessage {
   sender: "self" | "bot";
   message: string;
-  date: Date;
-  chatInputValue: string;
+  date: number;
+  // chatInputValue: string;
 }
 
 export interface ChatbotState {
@@ -16,7 +16,7 @@ export interface ChatbotState {
 const initialState: ChatbotState = {
   isActive: false,
   messages: [],
-  chatInputValue: ''
+  chatInputValue: "",
 };
 
 const chatbotSlice = createSlice({
@@ -29,9 +29,13 @@ const chatbotSlice = createSlice({
     setChatbotInput: (state, payload: PayloadAction<string>) => {
       state.chatInputValue = payload.payload;
     },
+    addMessage: (state, action: PayloadAction<ChatbotMessage>) => {
+      state.messages.push(action.payload);
+    },
   },
 });
 
-export const { setChatbotIsActive, setChatbotInput } = chatbotSlice.actions;
+export const { setChatbotIsActive, setChatbotInput, addMessage } =
+  chatbotSlice.actions;
 
 export default chatbotSlice.reducer;
