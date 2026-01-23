@@ -1,12 +1,14 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
+import { queryCollection } from './context/context';
+import { handleQuestion } from './langchain/langchain';
 
 const app = express();
 const PORT = 4000;
 const FRONTEND_ADDRESS = 'http://localhost:3000';
 
 type ChatRequestBody = {
-  messages: unknown;
+  query: string;
 };
 
 app.use(express.json());
@@ -25,17 +27,15 @@ app.use(cors({ origin: allowedOrigins }));
 // });
 
 app.post('/chat', async (req: Request<{}, {}, ChatRequestBody>, res: Response) => {
-  const { messages } = req.body;
-  if (
-    !Array.isArray(messages) ||
-    !messages.every((m) => typeof m === 'string')
-  ) {
-    return res.status(400).json({
-      error: 'messages must be an array of strings',
-    });
-  }
-  return res.status(200).json({ ok: 'BEANS' });
+  const { query } = req.body;
+  const documents = await queryCollection(query)
+
+  const prompt = "Respond to user's query using the following information\n\n" + documents.join(" ") + "\n this is the query: " + query
+  const response =  await handleQuestion(prompt)
+
+  return res.status(200).json({ response: response });
 });
+
 
 app.listen(PORT, () => {
   console.log(`listening on http://localhost:${PORT}`);
