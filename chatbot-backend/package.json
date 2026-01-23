@@ -16,6 +16,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "@chroma-core/google-gemini": "^0.1.8",
     "@langchain/google-genai": "^2.1.7",
     "acorn": "^8.15.0",
     "acorn-walk": "^8.3.4",
@@ -26,6 +27,7 @@
     "brace-expansion": "^1.1.12",
     "braces": "^3.0.3",
     "chokidar": "^3.6.0",
+    "chromadb": "^3.2.2",
     "concat-map": "^0.0.1",
     "cors": "^2.8.5",
     "create-require": "^1.1.1",
