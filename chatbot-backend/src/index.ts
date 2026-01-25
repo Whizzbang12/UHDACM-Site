@@ -30,7 +30,7 @@ app.post('/chat', async (req: Request<{}, {}, ChatRequestBody>, res: Response) =
   const { query } = req.body;
   const documents = await queryCollection(query)
 
-  const prompt = "Respond to user's query using the following information\n\n" + documents.join(" ") + "\n this is the query: " + query
+  const prompt = "In plain text, respond to user's query using the following information\n\n" + documents.join(" ") + "\n this is the query: " + query
   const response =  await handleQuestion(prompt)
 
   return res.status(200).json({ response: response });

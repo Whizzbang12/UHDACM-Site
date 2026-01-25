@@ -7,7 +7,6 @@ import {
   setChatbotIsActive,
 } from "./chatbotSlice";
 import { RootState } from "../store";
-import { useState } from "react";
 
 export default function Chatbot() {
   const dispatch = useDispatch();
@@ -70,17 +69,29 @@ function ChatSection() {
         date: Date.now(),
       }),
     );
-    dispatch(setChatbotInput(""));
 
-    setTimeout(() => {
-      dispatch(
-        addMessage({
-          sender: "bot",
-          message: "on it",
-          date: Date.now(),
-        }),
-      );
-    }, 500);
+    dispatch(setChatbotInput(""));
+    
+    const res = await (await fetch(`http://localhost:4000/chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        query: chatInputValue
+      })
+    })).json();
+    
+    const { response } = res;
+
+    dispatch(
+      addMessage({
+        sender: "bot",
+        message: response,
+        date: Date.now(),
+      }),
+    );
+
   };
 
   return (
