@@ -1,6 +1,4 @@
 import { ChromaClient, Collection } from "chromadb";
-import fs from "fs";
-import path from "path";
 import { env_vars } from "../env/envVars";
 import {
   cmsCollectionsSingular,
@@ -14,7 +12,6 @@ import {
 } from "@shared/types/cms/CMSTypes";
 import {
   DBCreate,
-  DBDelete,
   DBDeleteWithID,
   DBGet,
   DBSetWithID,
@@ -49,6 +46,7 @@ import {
   isValidSplitHeroColumnSingleImage,
   isValidSplitHeroColumnTextBlock,
 } from "@shared/types/cms/CMSCheck";
+import { createTicketForCollection } from "./tools";
 
 const maxTicketRetries = 3;
 
@@ -58,6 +56,7 @@ const cmsCollections = [
   ...cmsSingleTypes,
   ...cmsSingleTypePages,
 ]; // all the single type collections in the cms
+
 
 class VectorDBWriter {
   private client = new ChromaClient({
@@ -105,27 +104,7 @@ class VectorDBWriter {
         });
 
         if (res.documents.length == 0) {
-          promises.push(
-            new Promise(async (res) => {
-              // possibly unprocessed collection, should fetch from cms.
-              console.log(cmsCollection, "empty collection, should process");
-              const existingCollectionTicket = await DBGet("ticket", [
-                ["collection", "==", cmsCollection],
-              ]);
-              if (existingCollectionTicket.length > 0) {
-                // if an exising ticket exists, do not create new one.
-                return res();
-              }
-              // check if
-              const ticket: DBTicket = {
-                collection: cmsCollection,
-                failed: false,
-                tries: 0,
-              };
-              await DBCreate("ticket", ticket);
-              res();
-            }),
-          );
+          promises.push(createTicketForCollection(cmsCollection))
         }
         // console.log("health check res", JSON.stringify(res, null, 2));
       }
@@ -138,6 +117,7 @@ class VectorDBWriter {
     this.write();
   }
 
+  // WARNING: SPAGHETTI CODE BELOW (do not touch unless you know what you are doing)
   async write() {
     if (this.state != "idle") return;
     this.state = "writing";

@@ -83,7 +83,7 @@ const DocumentSamples: DocType[] = [
     category: "beta",
     num: 4,
   },
-];
+] as const;
 
 const collection: collectionName = "_test_collection";
 let DocumentSampleID = "";

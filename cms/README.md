@@ -63,6 +63,24 @@ If you cannot view the token, regenerate it, and save that key in your env.
 
 It will allow the frontend (and other services) to request data from the strapiCMS.
 
+## Registering webhooks
+A webhook for the site and vector-context-manager are **required**.
+
+Set them up by opening the strapi dashboard, then going to `settings > webhooks`.
+
+Once there
+- add a webhook for `url`
+- add header `Authorization` == `cmsAuthToken` (remember this value)
+- add the events `create`, `update`, and `delete`
+<br/>
+
+ENSURE SITE and VECTOR-CONTEXT-MANAGER has the `CMS_AUTH_TOKEN` and `CMS_URL` environment variables set. They will respond 403 if the header value does not match.
+
+ `http://localhost:3000/api/CMSUpdate` (site url), and . 
+
+Do the same thing for `http://localhost:5500/update` (vector db manager).
+
+
 
 ## Types
 There are many types.

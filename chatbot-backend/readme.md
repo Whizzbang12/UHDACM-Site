@@ -12,6 +12,25 @@ This is the backend for the chatbot application. Follow the steps below to set u
   npm install  
   ```  
 
+## Environment Variables
+```
+Set the following environment variables in a `.env` file in the project root:
+
+```env
+GOOGLE_API_KEYS=<key>,<key2>,...
+CHROMA_DB_HOST=localhost
+CHROMA_DB_PORT=5477
+CHROMA_DB_COLLECTION_NAME=primary
+PORT=4000
+```
+
+- `GOOGLE_API_KEYS`: Comma-separated list of Google API keys.
+- `CHROMA_DB_HOST`: Hostname for the Chroma database.
+- `CHROMA_DB_PORT`: Port number for the Chroma database.
+- `CHROMA_DB_COLLECTION_NAME`: Name of the Chroma collection to use.
+- `PORT`: Port for the backend server.
+```
+
 ## Running the Chroma Server  
 
 Start the Chroma server by running the following command:  
@@ -19,6 +38,16 @@ Start the Chroma server by running the following command:
 ```bash  
 npm run chroma-server  
 ```  
+
+> NOTE: for local testing, only one instance of the chroma-server is necessary
+> 
+> If `vector-context-manager`'s chromaDB server is running already, you don't need to run this one.
+>
+> Ensure the port for chromaDB is the same as `vector-context-manager`'s port.
+> 
+> Unexpected behavior will occur otherwise.
+> 
+> If you're connecting to a cloud instance, ensure the env is set properly.
 
 ## Running the Ingester  
 
@@ -34,6 +63,6 @@ Finally, start the backend server:
 
 ```bash  
 npm run dev  
-```  
+```
 
 Your chatbot backend should now be up and running!

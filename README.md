@@ -14,13 +14,29 @@ Fork the github repository, clone your fork locally, make changes, push them to 
 > Note: modification is reserved for UHD ACM club members (and a few individuals)
 
 ## Monorepo Structure
-See each monorepo's readme for more info.
-### ./cms:<br/>
-Backend powered by [Strapi](https://strapi.io/).<br/>
-Allows UHD ACM to
-### ./site:<br/>
-Frontend built with [Next.js](https://nextjs.org/).<br/>
-Relies on ./cms for page content.<br/>
+
+Each directory in the monorepo represents a core part of the project. Refer to the respective `README.md` in each folder for detailed setup and usage instructions.
+
+### ./cms
+Backend powered by [Strapi](https://strapi.io/).  
+Provides a headless CMS for dynamic content management, API endpoints, and webhook integration for the site and vector context manager.
+
+### ./site
+Frontend built with [Next.js](https://nextjs.org/).  
+Fetches content from the CMS and renders the public-facing website. Supports live content updates via webhooks and API tokens.
+
+### ./chatbot-backend
+Node.js backend for the chatbot feature.  
+Handles chatbot logic, integrates with ChromaDB for vector search, and ingests context from the CMS.
+
+### ./vector-context-manager
+Synchronizes CMS content into ChromaDB for advanced search and retrieval.  
+Manages collection updates, ticketing, and webhook-based synchronization.
+
+### ./shared
+Contains shared types and utility functions used across multiple packages to ensure consistency and reduce code duplication.
+
+
 
 ## How to Run
 The run scripts for each part of the project are located in their respective folder's **readme**. 

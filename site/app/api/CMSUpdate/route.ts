@@ -1,8 +1,15 @@
 
+import { EqualsTimed } from "@shared/tools";
 import { isCMSCollectionSingular, isCMSSingleType, isCMSSingleTypePage } from "@shared/types/cms/CMSCheck";
 import { revalidateTag } from "next/cache";
 
 export async function POST(req: Request) {
+  const headers = req.headers;
+  const CMSAuthToken = headers.get('authorization');
+  if (!await EqualsTimed(CMSAuthToken, process.env.CMS_AUTH_TOKEN, 1000)) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 403 });
+  }
+
   const body = await req.json();
 
   console.log('Received CMS update request:', body);

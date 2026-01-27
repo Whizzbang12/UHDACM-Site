@@ -4,7 +4,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, add environment variables
+**First**, add environment variables
 ```
 NEXT_PUBLIC_CMS_URL=http://localhost:1337
 
@@ -17,7 +17,8 @@ The Strapi API token is obtainable through the StrapiCMS (Set that up first)
 
 A walkthrough of how to obtain the api key is viewable through the cms `readme.md`
 
-Second, run the development server:
+
+**Second**, run the development server:
 
 ```bash
 npm run dev
@@ -33,9 +34,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-
+**Third**, when running the built version of the site (ontained via `npm run build` and `npm run start`), ensure the CMS has a **webhook** pointing registered for this site (See CMS readme for how to set that up). This is necessary to let the site's caching system work properly.
 
 
 

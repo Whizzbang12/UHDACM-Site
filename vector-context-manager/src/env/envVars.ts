@@ -11,7 +11,8 @@ const env_vars = {
   FB_ADMIN_JSON: JSON.parse(pe.FB_ADMIN_JSON!),
   CMS_URL: pe.CMS_URL!,
   CMS_API_TOKEN: pe.CMS_API_TOKEN!,
-  FRONTEND_URL: pe.FRONTEND_URL!
+  FRONTEND_URL: pe.FRONTEND_URL!,
+  CMS_AUTH_TOKEN: pe.CMS_AUTH_TOKEN!
 } as const;
 
 

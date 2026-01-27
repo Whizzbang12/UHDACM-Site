@@ -30,9 +30,40 @@ FB_ADMIN_JSON=<get firebase service account>   # Path or JSON for Firebase servi
 CMS_URL=http://localhost:1337           # URL for the CMS instance
 CMS_API_TOKEN=<get-from-cms>            # API token for CMS (see CMS readme)
 FRONTEND_URL=http://localhost:3000      # URL for the frontend (used in data formatting)
+CMS_AUTH_TOKEN=random-stuff             # secret key used by cms. tells this server requests are authentic
 ```
 - See [Here](https://firebase.google.com/docs/admin/setup#initialize_the_sdk_in_non-google_environments) to obtain firebase service account json
 - Read CMS readme to obtain API key
+
+## Running
+To run the project locally:
+
+**Start ChromaDB** (must be running before the context manager):
+```bash
+npm run chroma-server
+```
+> NOTE: for local testing, only one instance of the chroma-server is necessary
+> 
+> If `chatbot-backend`'s chromaDB server is running already, you don't need to run this one.
+>
+> Ensure the port for chromaDB is the same as `vector-context-manager`'s port.
+> 
+> Unexpected behavior will occur otherwise.
+> 
+> If you're connecting to a cloud instance, ensure the env is set properly.
+
+
+<br/>
+
+
+
+**Start the context manager server**:
+```bash
+npm run dev
+```
+
+Make sure your `.env` file is configured as described above before starting.
+
 
 ## Notes
 
