@@ -1,4 +1,4 @@
-import { StrapiPicture } from "@/app/_utils/types";
+import { StrapiPicture } from "@shared/types/cms/CMSTypes";
 import styles from "./HeroSingleImage.module.css";
 import { TryGetImageFormatUrl } from "@/app/_utils/types/cms/cmsTypeTools";
 

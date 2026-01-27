@@ -1,7 +1,7 @@
 // server component. Used to render logo and pass it in
 
 import { fetchCMS } from "@/app/_utils/cms";
-import { isValidSiteInfo } from "@/app/_utils/types/cms/cmsTypeValidation";
+import { isValidSiteInfo } from "@shared/types/cms/CMSCheck";
 import Navbar from "./Navbar";
 import { TryGetImageFormatUrl } from "@/app/_utils/types/cms/cmsTypeTools";
 

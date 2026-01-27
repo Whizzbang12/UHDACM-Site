@@ -1,4 +1,4 @@
-import { Month, Months } from "./types";
+import { Month, Months } from "@shared/types/general/generalTypes";
 /**
  * Converts a 0-based integer (0 = January) to a Month string.
  */

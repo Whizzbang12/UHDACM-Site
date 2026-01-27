@@ -6,9 +6,9 @@ import { EntryTileProps } from "../_components/EntryTile/EntryTile";
 import Footer from "../_components/Footer/Footer";
 import NavbarSC from "../_components/Navbar/NavbarSC";
 import { DefaultChevronRight } from "../_icons/Icons";
-import { SiteEvent } from "./types";
+import { SiteEvent } from "@shared/types/cms/CMSTypes";
 import { generateEventShareText, ProduceDateRangeText, TryGetImageFormatUrl } from "./types/cms/cmsTypeTools";
-import { isStrapiPicture } from "./validation";
+import { isStrapiPicture } from "@shared/types/cms/CMSCheck";
 
 export function EventToEntry(event: SiteEvent): EntryTileProps {
   const imgUrl = isStrapiPicture(event.previewImage)

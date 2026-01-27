@@ -5,7 +5,7 @@ import { easingType } from "@/app/_utils/easingFunctions";
 import WipeTransition from "./Transitions/WipeTransition";
 import DiagonalTransition from "./Transitions/DiagonalExpandTransition";
 import FadeTransition from "./Transitions/FadeTransition";
-import { CardinalDirection } from "@/app/_utils/types";
+import { CardinalDirection } from "@shared/types/general/generalTypes";
 
 type TransitionType = "wipe" | "diagonal" | "fade";
 /**

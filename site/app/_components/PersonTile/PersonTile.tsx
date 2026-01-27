@@ -14,11 +14,11 @@ import {
   DefaultClose,
   DefaultDiscord,
 } from "@/app/_icons/Icons";
+import { SocialSite } from "@shared/types/cms/CMSTypes";
 import {
   FunctionUnknown,
   CardinalDirection,
-  SocialSite,
-} from "@/app/_utils/types";
+} from "@shared/types/general/generalTypes";
 import { useBodyOverflowY } from "@/app/_features/body/useSetBodyOverflowY";
 import IndicateScrollableDiv from "../IndicateScrollableDiv/IndicateScrollableDiv";
 
@@ -183,7 +183,7 @@ function PersonTileExpanded({
 }) {
   function HandleClickSocialIcon(
     href?: string,
-    href_target?: HTMLAttributeAnchorTarget
+    href_target?: HTMLAttributeAnchorTarget,
   ) {
     href && window.open(href, href_target || "_blank");
   }
@@ -300,13 +300,13 @@ function PersonTileExpanded({
                     if (!IconComponent) return null;
                     return (
                       <IconComponent
-                        size={'2rem'}
+                        size={"2rem"}
                         style={combinedStyles}
                         onClick={onClickFunc}
                         key={key}
                       />
                     );
-                  }
+                  },
                 )}
               </div>
               <DefaultClose

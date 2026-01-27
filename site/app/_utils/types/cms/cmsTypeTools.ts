@@ -1,7 +1,6 @@
 
-import { QnA, SiteEvent, StrapiPicture } from "../../types";
+import { QnA, SiteEvent, StrapiPicture } from "@shared/types/cms/CMSTypes";
 import { ProduceCMSResourceURL } from "../../tools";
-import { EventToEntry } from "../../tsxTools";
 
 
 

@@ -1,9 +1,9 @@
 import PersonTile from "@/app/_components/PersonTile/PersonTile";
 import { fetchCMS } from "@/app/_utils/cms";
-import { Person, SocialObj } from "@/app/_utils/types";
+import { Person, SocialObj } from "@shared/types/cms/CMSTypes";
 import { TryGetImageFormatUrl } from "@/app/_utils/types/cms/cmsTypeTools";
-import { isValidLeadership } from "@/app/_utils/types/cms/cmsTypeValidation";
-import { isPerson } from "@/app/_utils/validation";
+import { isValidLeadership } from "@shared/types/cms/CMSCheck";
+import { isPerson } from "@shared/types/cms/CMSCheck";
 
 export default async function LeadershipSection({ sectionID }: { sectionID?: string }) {
   const res = await fetchCMS("leadership", {

@@ -6,9 +6,9 @@ import ShareButton from "@/app/_components/Button/CommonVariants/ShareButton";
 import AddToCalendarButton from "@/app/_components/Button/Variants/AddToCalendarButton";
 import FeaturedEvent from "@/app/_components/FeaturedEvent/FeaturedEvent";
 import { DefaultChevronRight } from "@/app/_icons/Icons";
-import { FeaturedEvent as FeaturedSiteEvent } from "@/app/_utils/types/cms/cmsTypes";
+import { FeaturedEvent as FeaturedSiteEvent } from "@shared/types/cms/CMSTypes";
 import { generateEventShareText, TryGetImageFormatUrl } from "@/app/_utils/types/cms/cmsTypeTools";
-import { isStrapiPicture, isValidSiteEvent } from "@/app/_utils/validation";
+import { isStrapiPicture, isValidSiteEvent } from "@shared/types/cms/CMSCheck";
 
 export default function FeaturedEventComp({
   featuredEvent,

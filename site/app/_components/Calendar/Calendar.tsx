@@ -3,7 +3,7 @@
 import { DefaultChevronLeft, DefaultChevronRight } from "@/app/_icons/Icons";
 import React from "react";
 import Select from "../Select/Select";
-import { Month, Months } from "@/app/_utils/types";
+import { Month, Months } from "@shared/types/general/generalTypes";
 import { monthToInt, toTitleCase } from "@/app/_utils/tools";
 import styles from "./Calendar.module.css";
 

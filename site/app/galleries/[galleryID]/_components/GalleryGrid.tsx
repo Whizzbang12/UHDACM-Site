@@ -5,7 +5,7 @@ import { AppDispatch } from "@/app/_features/store";
 import { useDispatch } from "react-redux";
 import { CarouselFullScreenImage } from "./CarouselFullScreenImage";
 import { CarouselThumbnail } from "./CarouselThumbnail";
-import { StrapiPicture } from "@/app/_utils/types";
+import { StrapiPicture } from "@shared/types/cms/CMSTypes";
 
 import styles from './GalleryGrid.module.css';
 import { TryGetImageFormatUrl } from "@/app/_utils/types/cms/cmsTypeTools";

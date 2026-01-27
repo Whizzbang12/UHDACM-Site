@@ -1,7 +1,7 @@
-import { StrapiPicture } from '@/app/_utils/types';
+import { StrapiPicture } from '@shared/types/cms/CMSTypes';
 import HeroSingleImageStyles from '../HeroSingleImage/HeroSingleImage.module.css';
 import { TryGetImageFormatUrl } from '@/app/_utils/types/cms/cmsTypeTools';
-import { isStrapiPicture } from '@/app/_utils/validation';
+import { isStrapiPicture } from '@shared/types/cms/CMSCheck';
 
 interface Props {
   images: StrapiPicture[];

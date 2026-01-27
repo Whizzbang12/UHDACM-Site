@@ -1,6 +1,6 @@
 "use client";
 
-import { StrapiPicture } from "@/app/_utils/types";
+import { StrapiPicture } from "@shared/types/cms/CMSTypes";
 import HeroSingleImageStyles from "../HeroSingleImage/HeroSingleImage.module.css";
 import { DefaultImageCollection } from "@/app/_icons/Icons";
 import { useDispatch } from "react-redux";
@@ -9,7 +9,7 @@ import { setPopupCarousel } from "@/app/_features/popupCarousel/popupCarouselSli
 import { CarouselFullScreenImage } from "@/app/galleries/[galleryID]/_components/CarouselFullScreenImage";
 import { CarouselThumbnail } from "@/app/galleries/[galleryID]/_components/CarouselThumbnail";
 import { TryGetImageFormatUrl } from "@/app/_utils/types/cms/cmsTypeTools";
-import { isStrapiPicture } from "@/app/_utils/validation";
+import { isStrapiPicture } from "@shared/types/cms/CMSCheck";
 
 export default function HeroImageCollection({
   images,

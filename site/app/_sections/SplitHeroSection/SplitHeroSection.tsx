@@ -4,7 +4,7 @@ import styles from "./SplitHeroSection.module.css";
 import {
   SiteSectionSplitHero,
   SplitHeroColumn
-} from "@/app/_utils/types/cms/cmsTypes";
+} from "@shared/types/cms/CMSTypes";
 import {
   isValidSplitHeroColumnFloatingImages,
   isValidSplitHeroColumnForm,
@@ -12,7 +12,7 @@ import {
   isValidSplitHeroColumnNone,
   isValidSplitHeroColumnSingleImage,
   isValidSplitHeroColumnTextBlock,
-} from "@/app/_utils/types/cms/cmsTypeValidation";
+} from "@shared/types/cms/CMSCheck";
 import HeroSingleImage from "./HeroSingleImage/HeroSingleImage";
 import HeroImageCollection from "./HeroImageCollection/HeroImageCollection";
 import HeroFloatingImages from "./HeroFloatingImage/HeroFloatingImages";

@@ -1,7 +1,7 @@
-import { buildCMSFetchURL } from "@shared/types/cms/CMSFuncs";
+import { buildCMSFetchURL, cmsPageFetchParams } from "@shared/types/cms/CMSFuncs";
 import {
   cmsSingleTypePage,
-} from "./types/cms/cmsTypes";
+} from "@shared/types/cms/CMSTypes";
 import { fetchableCMSCollection } from "@shared/types/cms/CMSTypes";
 
 
@@ -40,38 +40,5 @@ export async function fetchCMS(
 }
 
 export async function fetchCMSPage(page: cmsSingleTypePage) {
-  const populateList: string[] = [
-    "sections",
-    "sections.type",
-    "sections.leftComponent",
-    "sections.rightComponent",
-    "sections.leftComponent.form",
-    "sections.rightComponent.form",
-    "sections.leftComponent.textBlock",
-    "sections.rightComponent.textBlock",
-    "sections.leftComponent.textBlock.buttons",
-    "sections.rightComponent.textBlock.buttons",
-
-    "sections.leftComponent.imageCollection",
-    "sections.rightComponent.imageCollection",
-    "sections.leftComponent.imageCollection.images",
-    "sections.rightComponent.imageCollection.images",
-
-    "sections.leftComponent.singleImage",
-    "sections.rightComponent.singleImage",
-    "sections.leftComponent.singleImage.image",
-    "sections.rightComponent.singleImage.image",
-
-    "sections.leftComponent.floatingImages",
-    "sections.rightComponent.floatingImages",
-    "sections.leftComponent.floatingImages.images",
-    "sections.rightComponent.floatingImages.images",
-  ];
-
-  const params: { [key: string]: string } = {};
-  for (const i in populateList) {
-    params[`populate[${i}]`] = `${populateList[i]}`;
-  }
-
-  return await fetchCMS(page, params);
+  return await fetchCMS(page, cmsPageFetchParams);
 }

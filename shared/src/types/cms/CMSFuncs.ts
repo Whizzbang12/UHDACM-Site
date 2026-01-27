@@ -12,6 +12,7 @@ import {
   cmsCollectionsSingular,
   cmsSingleTypePage,
   fetchableCMSCollection,
+  StrapiPicture,
 } from "./CMSTypes";
 
 /**
@@ -57,42 +58,68 @@ export function buildCMSFetchURL(
   return { url, dependencyTags };
 }
 
-export function buildCMSFetchPageURL(cmsURL: string, page: cmsSingleTypePage) {
-  const populateList: string[] = [
-    "sections",
-    "sections.type",
-    "sections.leftComponent",
-    "sections.rightComponent",
-    "sections.leftComponent.form",
-    "sections.rightComponent.form",
-    "sections.leftComponent.textBlock",
-    "sections.rightComponent.textBlock",
-    "sections.leftComponent.textBlock.buttons",
-    "sections.rightComponent.textBlock.buttons",
+// a little hacky, but these are the params needed to populate the cms collection well enough for a page.
+export const cmsPageFetchParams = {
+  "populate[0]": "sections",
+  "populate[1]": "sections.type",
+  "populate[2]": "sections.leftComponent",
+  "populate[3]": "sections.rightComponent",
+  "populate[4]": "sections.leftComponent.form",
+  "populate[5]": "sections.rightComponent.form",
+  "populate[6]": "sections.leftComponent.textBlock",
+  "populate[7]": "sections.rightComponent.textBlock",
+  "populate[8]": "sections.leftComponent.textBlock.buttons",
+  "populate[9]": "sections.rightComponent.textBlock.buttons",
+  "populate[10]": "sections.leftComponent.imageCollection",
+  "populate[11]": "sections.rightComponent.imageCollection",
+  "populate[12]": "sections.leftComponent.imageCollection.images",
+  "populate[13]": "sections.rightComponent.imageCollection.images",
+  "populate[14]": "sections.leftComponent.singleImage",
+  "populate[15]": "sections.rightComponent.singleImage",
+  "populate[16]": "sections.leftComponent.singleImage.image",
+  "populate[17]": "sections.rightComponent.singleImage.image",
+  "populate[18]": "sections.leftComponent.floatingImages",
+  "populate[19]": "sections.rightComponent.floatingImages",
+  "populate[20]": "sections.leftComponent.floatingImages.images",
+  "populate[21]": "sections.rightComponent.floatingImages.images"
+} as const;
 
-    "sections.leftComponent.imageCollection",
-    "sections.rightComponent.imageCollection",
-    "sections.leftComponent.imageCollection.images",
-    "sections.rightComponent.imageCollection.images",
+// export function buildCMSFetchPageParams() {
+//   const populateList: string[] = [
+//     "sections",
+//     "sections.type",
+//     "sections.leftComponent",
+//     "sections.rightComponent",
+//     "sections.leftComponent.form",
+//     "sections.rightComponent.form",
+//     "sections.leftComponent.textBlock",
+//     "sections.rightComponent.textBlock",
+//     "sections.leftComponent.textBlock.buttons",
+//     "sections.rightComponent.textBlock.buttons",
 
-    "sections.leftComponent.singleImage",
-    "sections.rightComponent.singleImage",
-    "sections.leftComponent.singleImage.image",
-    "sections.rightComponent.singleImage.image",
+//     "sections.leftComponent.imageCollection",
+//     "sections.rightComponent.imageCollection",
+//     "sections.leftComponent.imageCollection.images",
+//     "sections.rightComponent.imageCollection.images",
 
-    "sections.leftComponent.floatingImages",
-    "sections.rightComponent.floatingImages",
-    "sections.leftComponent.floatingImages.images",
-    "sections.rightComponent.floatingImages.images",
-  ];
+//     "sections.leftComponent.singleImage",
+//     "sections.rightComponent.singleImage",
+//     "sections.leftComponent.singleImage.image",
+//     "sections.rightComponent.singleImage.image",
 
-  const params: { [key: string]: string } = {};
-  for (const i in populateList) {
-    params[`populate[${i}]`] = `${populateList[i]}`;
-  }
+//     "sections.leftComponent.floatingImages",
+//     "sections.rightComponent.floatingImages",
+//     "sections.leftComponent.floatingImages.images",
+//     "sections.rightComponent.floatingImages.images",
+//   ];
 
-  return buildCMSFetchURL(cmsURL, page, params);
-}
+//   const params: { [key: string]: string } = {};
+//   for (const i in populateList) {
+//     params[`populate[${i}]`] = `${populateList[i]}`;
+//   }
+
+//   return params;
+// }
 
 const convertFetchableToSingular = (
   path: fetchableCMSCollection,
@@ -125,4 +152,31 @@ export function cmsCollectionPluralToSingular(
   return index !== -1
     ? (cmsCollectionsSingular[index] as cmsCollectionSingular)
     : undefined;
+}
+
+
+
+/**
+ * Given strapi picture, try to get the URL for a specific format
+ * auto formats the url using `ProduceCMSResourceURL`.
+ * @param img 
+ * @param format 
+ * @returns 
+ */
+export function TryGetImageFormatPath(img: StrapiPicture, format: keyof StrapiPicture["formats"], cmsUrl: string) {
+  let url: string = '';
+  if (!img) return undefined;
+  if (img.formats && img.formats[format]) {
+    url = img.formats[format].url;
+  } else {
+    url = img.url;
+  }
+
+  if (!url) {
+    return undefined;
+  }
+  if (url.at(0) == "/") {
+    return `${cmsUrl}${url}`;
+  }
+  return url;
 }

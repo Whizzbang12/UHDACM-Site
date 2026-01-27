@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { FunctionUnknown } from "@/app/_utils/types";
+import { FunctionUnknown } from "@shared/types/general/generalTypes";
 import styles from "./Button.module.css";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

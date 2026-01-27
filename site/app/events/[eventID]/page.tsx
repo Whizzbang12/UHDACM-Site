@@ -1,7 +1,7 @@
 import Button from "@/app/_components/Button/Button";
 
 import { fetchCMS } from "@/app/_utils/cms";
-import { isValidSiteEvent } from "@/app/_utils/validation";
+import { isValidSiteEvent } from "@shared/types/cms/CMSCheck";
 import Page404 from "@/app/not-found";
 import EventPageClientComponent from "./EventPageClientComponent";
 import { WrapInNavbarAndFooter } from "@/app/_utils/tsxTools";

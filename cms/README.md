@@ -61,7 +61,7 @@ Once Strapi is running, go to the admin portal and go to settings (gear icon, le
 
 If you cannot view the token, regenerate it, and save that key in your env.
 
-It will allow the frontend to request data from the strapiCMS.
+It will allow the frontend (and other services) to request data from the strapiCMS.
 
 
 ## Types

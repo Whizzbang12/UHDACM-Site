@@ -10,9 +10,9 @@ import {
   DefaultYoutube,
 } from "@/app/_icons/Icons";
 import Logo from '../Logo/Logo';
-import { isValidSiteInfo } from '@/app/_utils/types/cms/cmsTypeValidation';
+import { isValidSiteInfo } from "@shared/types/cms/CMSCheck";
 import { fetchCMS } from '@/app/_utils/cms';
-import { SocialObj } from '@/app/_utils/types';
+import { SocialObj } from '@shared/types/cms/CMSTypes';
 import { TryGetImageFormatUrl } from '@/app/_utils/types/cms/cmsTypeTools';
 
 

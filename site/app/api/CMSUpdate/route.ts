@@ -1,5 +1,5 @@
 
-import { isCMSCollectionSingular, isCMSSingleType, isCMSSingleTypePage } from "@/app/_utils/types/cms/cmsTypeValidation";
+import { isCMSCollectionSingular, isCMSSingleType, isCMSSingleTypePage } from "@shared/types/cms/CMSCheck";
 import { revalidateTag } from "next/cache";
 
 export async function POST(req: Request) {
@@ -23,8 +23,8 @@ export async function POST(req: Request) {
 
   console.log(`Revalidating tag for model: ${model}`);
   // revalidates all paths that rely on the CMS collection
-  revalidateTag(model);
-  revalidateTag('any');
+  revalidateTag(model, 'max');
+  revalidateTag('any', 'max');
 
   return new Response(JSON.stringify({ okay: true }));
 }

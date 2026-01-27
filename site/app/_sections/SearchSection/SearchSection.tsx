@@ -1,10 +1,10 @@
 import { fetchCMS } from "@/app/_utils/cms";
-import { isValidQnA, isValidSiteEvent } from "@/app/_utils/validation";
+import { isValidQnA, isValidSiteEvent } from "@shared/types/cms/CMSCheck";
 import { ReactNode, Suspense } from "react";
 
 import styles from "./SearchSection.module.css";
-import { SearchSectionType } from "@/app/_utils/types/cms/cmsTypes";
-import { EntrySortMode, ListingMode, QnA, SiteEvent } from "@/app/_utils/types";
+import { SearchSectionType } from "@shared/types/cms/CMSTypes";
+import { EntrySortMode, ListingMode, QnA, SiteEvent } from "@shared/types/cms/CMSTypes";
 import { EventSearchTool, GallerySearchTool, QnASearchTool } from "./SearchSectionSearchTools";
 export default async function SearchSection({
   header,

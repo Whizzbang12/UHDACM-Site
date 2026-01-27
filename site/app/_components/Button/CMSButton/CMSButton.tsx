@@ -1,4 +1,4 @@
-import { CMSButton as CMSButtonProps } from "@/app/_utils/types/cms/cmsTypes";
+import { CMSButton as CMSButtonProps } from "@shared/types/cms/CMSTypes";
 import Button from "../Button";
 import { getDefaultIconForCMSButton } from "@/app/_utils/types/cms/cmsTypeToolsTsx";
 
