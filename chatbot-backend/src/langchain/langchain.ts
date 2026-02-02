@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
 
-type GeminiModelName = 'gemma-3-27b-it';
+type GeminiModelName = 'gemma-3-1b-it' | 'gemma-3-27b-it';
 
 const RAW_KEYS: string =
   process.env.GOOGLE_API_KEYS ?? process.env.GOOGLE_API_KEY ?? '';
@@ -52,14 +52,13 @@ function shouldRotateKey(err: unknown): boolean {
   );
 }
 
-export async function handleQuestion(question: string): Promise<string> {
+export async function handleQuestion(question: string, modelName: GeminiModelName = 'gemma-3-27b-it'): Promise<string> {
   let lastErr: unknown = null;
 
   console.log('working on it');
   for (let attempt = 0; attempt < API_KEYS.length; attempt++) {
     const apiKey = getCurrentKey();
     try {
-      const modelName: GeminiModelName = 'gemma-3-27b-it';
       const model = new ChatGoogleGenerativeAI({
         model: modelName,
         apiKey,

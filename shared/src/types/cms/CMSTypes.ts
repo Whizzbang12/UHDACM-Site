@@ -214,7 +214,7 @@ export interface SiteInfo {
 
 
 import { BlocksContent } from '@strapi/blocks-react-renderer'
-import { ObjectAny } from "../general/generalTypes";
+import { ObjectUnknown } from "../general/generalTypes";
 
 
 export type SiteEvent = {
@@ -227,7 +227,7 @@ export type SiteEvent = {
   descriptionShort: string;
   descriptionFull: BlocksContent;
   location: string;
-  gallery?: ObjectAny;
+  gallery?: ObjectUnknown;
   organizations?: Organization[];
 };
 

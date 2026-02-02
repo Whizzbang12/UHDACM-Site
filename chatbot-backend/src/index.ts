@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import { queryCollection } from "./context/context";
 import { handleQuestion } from "./langchain/langchain";
+import { processQuery } from "./query/query";
 
 const app = express();
 const PORT = 4000;
@@ -29,16 +30,8 @@ app.post(
   "/chat",
   async (req: Request<{}, {}, ChatRequestBody>, res: Response) => {
     const { query } = req.body;
-    const documents = await queryCollection(query);
 
-    const prompt =
-      "(Date: " +
-      Date.now().toLocaleString() +
-      ") In plain text, respond to user's query using the following information\n\n" +
-      documents.join(" ") +
-      "\n this is the query: " +
-      query;
-    const response = await handleQuestion(prompt);
+    const response = await processQuery(query);
 
     return res.status(200).json({ response: response });
   },

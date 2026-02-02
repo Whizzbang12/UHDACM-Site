@@ -71,3 +71,8 @@ Make sure your `.env` file is configured as described above before starting.
 - Most logic is in `writer.ts`.
 - Webhook support is planned but not implemented.
 - Ensure all dependencies (ChromaDB, CMS, Firestore) are running before starting.
+
+
+## Known Limitations
+- Event data stored in vectorDB uses shortDescription, but no fullDecription.
+  - This makes the fullDescription unreachable to the chatbot.

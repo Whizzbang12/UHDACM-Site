@@ -47,6 +47,18 @@ import {
   isValidSplitHeroColumnTextBlock,
 } from "@shared/types/cms/CMSCheck";
 import { createTicketForCollection } from "./tools";
+import {
+  PartialSiteEvent,
+  VectorDBBaseMetadata,
+  VectorDBFeaturedEventMetadata,
+  VectorDBPageMetadata,
+  VectorDBPageMetadataAction,
+  VectorDBPersonMetadata,
+  VectorDBQnAMetadata,
+  VectorDBSiteInfoMetadata,
+} from "@shared/types/vectorDB/vectorDBTypes";
+import { convertSiteEventToPartialSiteEvent, convertVectorDBMetadataToSafeMetadata } from "@shared/types/vectorDB/vectorDBFuncs";
+import { vectorDBEmptyCollectionMarkerDocument } from "@shared/types/vectorDB/vectorDBData";
 
 const maxTicketRetries = 3;
 
@@ -104,9 +116,10 @@ class VectorDBWriter {
         });
 
         if (res.documents.length == 0) {
-          promises.push(createTicketForCollection(cmsCollection))
+          promises.push(createTicketForCollection(cmsCollection));
         }
-        // console.log("health check res", JSON.stringify(res, null, 2));
+        console.log(cmsCollection, res.documents.length);
+        console.log("health check res", JSON.stringify(res.documents, null, 2));
       }
       await Promise.all(promises);
     } catch (e) {
@@ -179,7 +192,7 @@ class VectorDBWriter {
     // fetch data from cms
 
     const collection = ticket.collection;
-    let collectionDataStringArray: string[] = [];
+    let collectionDataMetadataArray: [string, VectorDBBaseMetadata][] = [];
     console.log("working", collection);
     if (isCMSSingleTypePage(collection)) {
       try {
@@ -215,84 +228,147 @@ class VectorDBWriter {
           sections.push(section);
         }
 
-        console.log("1 ==");
-
-        const pageData: string[] = [];
+        console.log("2 ==");
+        let pageURL = env_vars.FRONTEND_URL + "/";
+        switch (collection) {
+          case "page-about":
+            pageURL += "about";
+            break;
+          case "page-contact":
+            pageURL += "contact";
+            break;
+          case "page-events":
+            pageURL += "events";
+            break;
+          case "page-galleries":
+            pageURL += "galleries";
+            break;
+          case "page-home":
+            pageURL += "";
+            break;
+          case "page-join":
+            pageURL += "join";
+            break;
+          case "page-media":
+            pageURL += "media";
+            break;
+          case "page-qnas":
+            pageURL += "qnas";
+            break;
+        }
+        
+        
         for (const section of sections) {
           if (isValidSiteSectionLeadership(section)) {
-            pageData.push("leadership-section");
+            // leadership section adds nothing semantically
+            // pageData.push("leadership-section");
           } else if (isValidSiteSectionFeaturedEvent(section)) {
-            pageData.push(
-              `featured event, ${section.header ? "header" + section.header : ""}`,
-            );
+            // featured event section adds nothing semantically
+            // pageData.push(
+            //   `featured event, ${section.header ? "header" + section.header : ""}`,
+            // );
           } else if (isValidSiteSectionLatestQnA(section)) {
-            pageData.push(
-              `Section buttons: [Latest QnA, All QnA] (Question and Answer Interview Video)`,
-            );
+            // latest QnA section adds nothing semantically
+            // pageData.push(
+            //   `Section buttons: [Latest QnA, All QnA] (Question and Answer Interview Video)`,
+            // );
+
+            const pageMetaData: VectorDBPageMetadata = {
+              url:
+                pageURL + `${section.sectionID ? "#" + section.sectionID : ""}`,
+              collection: collection,
+              // actions: [],
+            };
+            collectionDataMetadataArray.push([
+              `View latest and all Question and Answer Interview Videos`,
+              pageMetaData,
+            ]);
           } else if (isValidSiteSectionSearch(section)) {
-            pageData.push(
-              `Search ${section.type} ${section.type == "qnas" ? "Question and Answer Interview Video" : ""}${section.header ? ", header" + section.header : ""}`,
-            );
+            const pageMetaData: VectorDBPageMetadata = {
+              url:
+                pageURL + `${section.sectionID ? "#" + section.sectionID : ""}`,
+              collection: collection,
+              // actions: [],
+            };
+            collectionDataMetadataArray.push([
+              `Search + Calendar ${section.type} ${section.type == "qnas" ? "Question and Answer Interview Video" : ""}`,
+              pageMetaData,
+            ]);
           } else if (isValidSiteSectionSplitHero(section)) {
-            const processComps = (component: SplitHeroColumn | undefined) => {
+            const processComps = (
+              component: SplitHeroColumn | undefined,
+            ): [string, VectorDBPageMetadataAction[]] => {
               if (component == null) {
-                return null;
+                return ["", []];
               }
               if (isValidSplitHeroColumnNone(component)) {
-                return;
+                return ["", []];
               } else if (isValidSplitHeroColumnTextBlock(component)) {
                 const { textBlock } = component;
+                const actions: VectorDBPageMetadataAction[] = [];
                 let res = "";
-                res += `${textBlock.preheader} ${textBlock.header} ${textBlock.subheader}.`;
+                res += `${textBlock.preheader || ''}. ${textBlock.header || ''}. ${textBlock.subheader || ''}.`;
                 if (textBlock.buttons) {
-                  res += " Buttons: ";
                   for (const button of textBlock.buttons) {
-                    res += `("${button.text}", link/href: ${button.href[0] == "/" ? env_vars.FRONTEND_URL : ""}${button.href} (${button.target}), icon: ${button.icon}), `;
+                    actions.push({
+                      label: button.text,
+                      href:
+                        (button.href[0] == "/" ? env_vars.FRONTEND_URL : "") +
+                        button.href,
+                    });
                   }
                 }
-                return res;
+                return [res, actions];
               } else if (isValidSplitHeroColumnSingleImage(component)) {
-                const { singleImage } = component;
-                const { image } = singleImage;
-                return `Single Image, alt: ${image.alternativeText}, cap: ${image.caption}, name: ${image.name}, url: ${image.url}`;
+                // image adds nothing semantically
+
+                // const { singleImage } = component;
+                // const { image } = singleImage;
+                return ["", []];
               } else if (isValidSplitHeroColumnImageCollection(component)) {
-                const { images } = component.imageCollection;
-                let res = "Image Collection | ";
-                for (const image of images) {
-                  res += `[Image, alt: ${image.alternativeText}, cap: ${image.caption}, name: ${image.name}, url: ${image.url}],`;
-                }
-                res += ")";
-                return res;
+                // image adds nothing semantically
+
+                // const { images } = component.imageCollection;
+                // let res = "Image Collection \n\n ";
+                // for (const image of images) {
+                //   res += `[Image, alt: ${image.alternativeText}, cap: ${image.caption}, name: ${image.name}, url: ${image.url}],`;
+                // }
+                // res += ")";
+                return ["", []];
               } else if (isValidSplitHeroColumnFloatingImages(component)) {
-                const { images } = component.floatingImages;
-                let res = "floating images | ";
-                for (const image of images) {
-                  res += `[Image, alt: ${image.alternativeText}, cap: ${image.caption}, name: ${image.name}, url: ${image.url}],`;
-                }
-                return res;
+                // image adds nothing semantically
+                // const { images } = component.floatingImages;
+                // let res = "floating images | ";
+                // for (const image of images) {
+                //   res += `[Image, alt: ${image.alternativeText}, cap: ${image.caption}, name: ${image.name}, url: ${image.url}],`;
+                // }
+                return ["", []];
               } else if (isValidSplitHeroColumnForm(component)) {
-                let res = `Form: ${component.form.iFrameFormUrl}`;
-                return res;
+                // let res = `Form: ${component.form.iFrameFormUrl}`;
+                return ["A form's in this section", []];
               } else {
                 // TODO: fails silently
                 console.error("unhandled component");
-                return "";
+                return ["", []];
               }
             };
 
             const leftRes = processComps(section.leftComponent);
             const rightRes = processComps(section.rightComponent);
             let sectionData = "";
-            if (leftRes) {
-              sectionData += leftRes + " | ";
+            if (leftRes[0].length != 0) {
+              sectionData += leftRes[0] + " | ";
             }
-            if (rightRes) {
-              sectionData += rightRes;
+            if (rightRes[0].length != 0) {
+              sectionData += rightRes[0];
             }
 
-            if (sectionData) {
-              pageData.push(sectionData);
-            }
+            const pageMetaData: VectorDBPageMetadata = {
+              collection: collection,
+              actions: [...leftRes[1], ...rightRes[1]],
+              url: pageURL,
+            };
+            collectionDataMetadataArray.push([sectionData, pageMetaData]);
           } else {
             console.error(
               "unhanlded section",
@@ -300,37 +376,12 @@ class VectorDBWriter {
             );
           }
         }
-
-        console.log("2 ==");
-        let pageURL = env_vars.FRONTEND_URL+'/';
-        switch (collection) {
-          case 'page-about' :
-            pageURL += 'about';
-            break;
-          case 'page-contact':
-            pageURL += 'contact';
-            break;
-          case 'page-events' :
-            pageURL += 'events';
-            break;
-          case 'page-galleries' :
-            pageURL += 'galleries';
-            break;
-          case 'page-home' :
-            pageURL += '';
-            break;
-          case 'page-join' :
-            pageURL += 'join';
-            break;
-          case 'page-media':
-            pageURL += 'media';
-            break;
-          case 'page-qnas':
-            pageURL += 'qnas';
-            break;
-        }
-
-        collectionDataStringArray.push(`${pageURL}\n`+ pageData.join("\n")+'\n');
+        const pageMetadata: VectorDBPageMetadata = {
+          collection: collection,
+          url: pageURL,
+          actions: []
+        };
+        collectionDataMetadataArray.push([collection, pageMetadata]);
       } catch (e) {
         // TODO: fails silently
         console.error("vs89hosidv", (e as Error).message);
@@ -365,9 +416,20 @@ class VectorDBWriter {
 
         const featuredEvent = res.data;
         if (isValidFeaturedEvent(featuredEvent)) {
-          collectionDataStringArray.push(
-            `Featured event: ${featuredEvent.event.name}, ${featuredEvent.event.dateStart} - ${featuredEvent.event.dateEnd}, ${featuredEvent.event.location}, ${featuredEvent.event.descriptionShort}, (${env_vars.FRONTEND_URL}/${featuredEvent.event.urlSlug}) ${featuredEvent.previewImageHD}`,
+          const { event } = featuredEvent;
+          const partialSiteEvent = convertSiteEventToPartialSiteEvent(
+            event,
+            env_vars.CMS_URL,
+            env_vars.FRONTEND_URL
           );
+          const featuredEventMetaData: VectorDBFeaturedEventMetadata = {
+            collection: collection,
+            event: partialSiteEvent,
+          };
+          collectionDataMetadataArray.push([
+            `Featured event: ${featuredEvent.event.name}, ${featuredEvent.event.dateStart} - ${featuredEvent.event.dateEnd}, ${featuredEvent.event.location}, ${featuredEvent.event.descriptionShort}, (${env_vars.FRONTEND_URL}/${featuredEvent.event.urlSlug}) ${featuredEvent.previewImageHD}`,
+            featuredEventMetaData,
+          ]);
         } else {
           console.error("featured event invalid");
         }
@@ -397,9 +459,13 @@ class VectorDBWriter {
         if (isValidLeadership(leadership)) {
           const people = leadership.people;
           for (const person of people) {
-            collectionDataStringArray.push(
-              `${person.role}: ${person.name} ${person.picture ? TryGetImageFormatPath(person.picture, "small", env_vars.CMS_URL) : ""} ${person.description} | ${person.socials.map((social) => social.type + ": " + social.url + ", ")}`,
-            );
+            const personMetaData: VectorDBPersonMetadata = {
+              collection: collection,
+            };
+            collectionDataMetadataArray.push([
+              `${person.role}: ${person.name}, desc: ${person.description}.`,
+              personMetaData,
+            ]);
           }
         }
       } else if (collection == "site-info") {
@@ -425,14 +491,15 @@ class VectorDBWriter {
 
         const { data } = res;
         if (isValidSiteInfo(data)) {
-          collectionDataStringArray.push(
-            `logo: ${data.logo ? TryGetImageFormatPath(data.logo, "small", env_vars.CMS_URL) : ""}`,
-          );
-          for (const social of data.socials || []) {
-            collectionDataStringArray.push(
-              `UHD ACM ${social.type} ${social.url}`,
-            );
-          }
+          // const
+          const siteInfoMetaData: VectorDBSiteInfoMetadata = {
+            collection: collection,
+            socialUrls: (data.socials || []).map((v) => v.url),
+          };
+          collectionDataMetadataArray.push([
+            `UHD ACM Social-Media: ${data.socials ? data.socials.map((s) => s.type) : "none"}`,
+            siteInfoMetaData,
+          ]);
         }
       }
     } else if (isCMSCollectionSingular(collection)) {
@@ -464,49 +531,55 @@ class VectorDBWriter {
         console.log("checked events, done");
 
         for (const event of validEvents) {
-          collectionDataStringArray.push(
-            `Event: ${event.name}, ${event.dateStart} ${event.dateEnd}, has gallery: ${!!event.gallery}, ${event.location}, ${event.descriptionShort}, ${env_vars.FRONTEND_URL}/${event.urlSlug}, ${event.previewImage ? TryGetImageFormatPath(event.previewImage, "small", env_vars.CMS_URL) : ""}`,
+          const partialSiteEvent = convertSiteEventToPartialSiteEvent(
+            event,
+            env_vars.CMS_URL,
+            env_vars.FRONTEND_URL
           );
+          const eventMetaData: VectorDBFeaturedEventMetadata = {
+            collection: collection,
+            event: partialSiteEvent,
+          };
+          collectionDataMetadataArray.push([
+            `Event: ${event.name}, ${event.location}, ${event.descriptionShort}`,
+            eventMetaData,
+          ]);
         }
       } else if (collection == "gallery") {
-        const { url } = buildCMSFetchURL(`${env_vars.CMS_URL}`, "events", {
-          "populate[0]": "previewImage",
-          "populate[1]": "gallery",
-          "populate[2]": "gallery.media",
-        });
-
-        const res = await (
-          await fetch(`${url}`, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${env_vars.CMS_API_TOKEN}`,
-            },
-          })
-        ).json();
-
-        const eventsRaw = res ? res.data : [];
-        const validEvents: SiteEvent[] = [];
-        for (const event of eventsRaw) {
-          if (isValidSiteEvent(event) && event.gallery) {
-            validEvents.push(event);
-          }
-        }
-
-        for (const event of validEvents) {
-          const media = event.gallery?.media || [];
-
-          const validMedia: StrapiPicture[] = [];
-          for (const pic of media) {
-            if (isStrapiPicture(pic)) {
-              validMedia.push(pic);
-            }
-          }
-
-          collectionDataStringArray.push(
-            `Event Gallery: ${event.name}, ${event.dateStart} ${event.dateEnd}, has gallery: ${!!event.gallery}, ${event.location}, ${event.descriptionShort}, ${env_vars.FRONTEND_URL}/${event.urlSlug}, ${event.previewImage ? TryGetImageFormatPath(event.previewImage, "small", env_vars.CMS_URL) : ""}, photo count: ${validMedia.length}`,
-          );
-        }
+        // not processing gallery, as its contents aren't unique enough (covered by event)
+        //   const { url } = buildCMSFetchURL(`${env_vars.CMS_URL}`, "events", {
+        //     "populate[0]": "previewImage",
+        //     "populate[1]": "gallery",
+        //     "populate[2]": "gallery.media",
+        //   });
+        //   const res = await (
+        //     await fetch(`${url}`, {
+        //       method: "GET",
+        //       headers: {
+        //         "Content-Type": "application/json",
+        //         Authorization: `Bearer ${env_vars.CMS_API_TOKEN}`,
+        //       },
+        //     })
+        //   ).json();
+        //   const eventsRaw = res ? res.data : [];
+        //   const validEvents: SiteEvent[] = [];
+        //   for (const event of eventsRaw) {
+        //     if (isValidSiteEvent(event) && event.gallery) {
+        //       validEvents.push(event);
+        //     }
+        //   }
+        //   for (const event of validEvents) {
+        //     const media = event.gallery?.media || [];
+        //     const validMedia: StrapiPicture[] = [];
+        //     for (const pic of media) {
+        //       if (isStrapiPicture(pic)) {
+        //         validMedia.push(pic);
+        //       }
+        //     }
+        //     collectionDataMetadataArray.push(
+        //       `Event Gallery: ${event.name}, ${event.dateStart} ${event.dateEnd}, has gallery: ${!!event.gallery}, ${event.location}, ${event.descriptionShort}, ${env_vars.FRONTEND_URL}/${event.urlSlug}, ${event.previewImage ? TryGetImageFormatPath(event.previewImage, "small", env_vars.CMS_URL) : ""}, photo count: ${validMedia.length}`,
+        //     );
+        //   }
       } else if (collection == "qna") {
         const { url } = buildCMSFetchURL(`${env_vars.CMS_URL}`, "qnas", {
           populate: "thumbnail",
@@ -533,9 +606,14 @@ class VectorDBWriter {
         }
 
         for (const QnA of validQnAs) {
-          collectionDataStringArray.push(
-            `QnA Interview "${QnA.videoName}" feat. ${QnA.featuredGuests}, ${QnA.descriptionShort}, uploaded ${QnA.uploadDate}, ${QnA.videoLink}, ${QnA.thumbnail ? TryGetImageFormatPath(QnA.thumbnail, "small", env_vars.CMS_URL) : ""}`,
-          );
+          const QnAMetaData: VectorDBQnAMetadata = {
+            QnA: QnA,
+            collection: collection,
+          };
+          collectionDataMetadataArray.push([
+            `QnA Interview "${QnA.videoName}" feat. ${QnA.featuredGuests}, ${QnA.descriptionShort}`,
+            QnAMetaData,
+          ]);
         }
       }
       // organization and person unhandled
@@ -562,18 +640,22 @@ class VectorDBWriter {
       },
     });
 
-    if (collectionDataStringArray.length == 0) {
-      collectionDataStringArray.push(`empty`);
+    if (collectionDataMetadataArray.length == 0) {
+      collectionDataMetadataArray.push([
+        vectorDBEmptyCollectionMarkerDocument,
+        {
+          collection: collection,
+        },
+      ]);
     }
 
     // update data in vectorDB about data
     await vectorDBCollection.add({
-      documents: collectionDataStringArray,
-      ids: collectionDataStringArray.map((_, i) => `${collection}-${i}`),
-      metadatas: collectionDataStringArray.map(() => {
-        return {
-          collection: collection,
-        };
+      documents: collectionDataMetadataArray.map(([str]) => str),
+      ids: collectionDataMetadataArray.map((_, i) => `${collection}-${i}`),
+      metadatas: collectionDataMetadataArray.map(([_, meta]) => {
+        const safeMeta = convertVectorDBMetadataToSafeMetadata(meta);
+        return safeMeta;
       }),
     });
 

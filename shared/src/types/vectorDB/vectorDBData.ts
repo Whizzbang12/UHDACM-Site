@@ -1,0 +1,1 @@
+export const vectorDBEmptyCollectionMarkerDocument = '__EMPTY_COLLECTION__';
