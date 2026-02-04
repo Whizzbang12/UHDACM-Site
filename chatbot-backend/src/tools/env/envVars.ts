@@ -10,7 +10,7 @@ export const env_vars = {
   CHROMA_DB_HOST: pe.CHROMA_DB_HOST!,
   CHROMA_DB_PORT: Number(pe.CHROMA_DB_PORT!),
   CHROMA_DB_COLLECTION_NAME: pe.CHROMA_DB_COLLECTION_NAME!,
-  AI_MODEL: pe.GEMINI_CHAT_MODEL!,
+  AI_MODEL: pe.AI_MODEL!,
   AI_APIKEYS: (() => {
     const RAW_KEYS: string = pe.GOOGLE_API_KEYS!;
 

@@ -78,6 +78,7 @@ export default function Chat() {
         method: "POST",
         headers: {
           whatever: "whatever",
+          'Content-Type': "application/json"
         },
         body: JSON.stringify({
           query: message,
@@ -98,6 +99,7 @@ export default function Chat() {
         },
       ]);
     } catch (error) {
+      console.error(error);
       setMessages((prev) => [
         ...prev,
         {
