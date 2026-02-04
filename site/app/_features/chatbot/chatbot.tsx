@@ -1,195 +1,333 @@
-import { IoChatbubblesOutline } from "react-icons/io5";
-import styles from "./chatbot.module.css";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  addMessage,
-  setChatbotInput,
-  setChatbotIsActive,
-} from "./chatbotSlice";
-import { RootState } from "../store";
+import { useState, useRef, useEffect } from "react";
+import styles from "./chatbot.module.css"
 
-export default function Chatbot() {
-  const dispatch = useDispatch();
-  const { isActive } = useSelector((store: RootState) => store.chatbot);
-  const handleButton = () => {
-    dispatch(setChatbotIsActive(!isActive));
-  };
+import { HiOutlineSparkles,  } from "react-icons/hi";
+import { MdOutlineClose } from "react-icons/md";
+import { LuSend, LuSquareArrowOutUpRight } from "react-icons/lu";
 
-  return (
-    <div className={`${styles.chatbot_container}`}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "end",
-          alignItems: "end",
-          flexDirection: "column",
-          gap: "0.5rem",
-        }}
-      >
-        {isActive && <ChatSection />}
-        <div
-          style={{
-            width: "3rem",
-            height: "3rem",
-            backgroundColor: "orange",
-            borderRadius: "1rem",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            border: "1px solid #fff2",
-            cursor: "pointer",
-            userSelect: "none",
-          }}
-          onClick={handleButton}
-        >
-          <IoChatbubblesOutline color="white" size="1.5rem" />
-        </div>
-      </div>
-    </div>
-  );
+
+// temporary, seeing how to format msgs (CSS) + scrolling to bottom
+interface Message{
+    sender: 'user' | 'bot';
+    message:string;
+    timestamp: Date;
+    relavent_actions?: {
+        label: string;
+        href:string;
+    }[];
 }
 
-function ChatSection() {
-  const { chatInputValue, messages } = useSelector(
-    (store: RootState) => store.chatbot,
-  );
 
-  const dispatch = useDispatch();
+export default function Chat(){
 
-  const handleInputChange = (val: string) => {
-    dispatch(setChatbotInput(val));
-  };
+    const [isOpenWebChat, setOpenWebChat] = useState(false);
+    const [isClosing, setIsClosing] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    dispatch(
-      addMessage({
-        sender: "self",
-        message: chatInputValue,
-        date: Date.now(),
-      }),
-    );
+    const [messages, setMessages] = useState<Message[]>([{
+        sender: 'bot',
+        message: 'Hey, welcome to UHD ACM! What are you looking for today?',
+        timestamp: new Date(),
+        // just to show "relavent actions" & style since im retrieving nothing 
+        relavent_actions:[
+            {
+                label:"click me",
+                href:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+            }
+        ]
+    }
+    ])
 
-    dispatch(setChatbotInput(""));
+    // CHATBOT PART!
+    // scrolls down when new messages are sent
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    useEffect(() =>{
+        scrollToBottom();
+    }, [messages]);
+
+    // loading bubble
+    const [isLoading, setIsLoading] = useState(false);
+
     
-    const res = await (await fetch(`http://localhost:4000/chat`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        query: chatInputValue
-      })
-    })).json();
-    
-    const { response } = res;
+    const sendMessage = async(message:string) => {
+        if (!message.trim()) return;
 
-    dispatch(
-      addMessage({
-        sender: "bot",
-        message: response,
-        date: Date.now(),
-      }),
-    );
+        setMessages(prev => [...prev,{
+            sender: 'user',
+            message:message,
+            timestamp: new Date(),
+        }]);
 
-  };
+        setIsLoading(true);
+        setInputValue("");
 
-  return (
-    <div
-      style={{
-        backgroundColor: "orange",
-        borderRadius: "0.5rem",
-        border: "1px solid #fff2",
-        padding: "0.5rem",
-        height: "20rem",
-        display: "flex",
-        flexDirection: "column",
-        gap: "0.5rem",
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          backgroundColor: "#222",
-          borderRadius: "0.5rem",
-          padding: "0.5rem",
-          boxSizing: "border-box",
-        }}
-      >
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            backgroundColor: "#222",
-            borderRadius: "0.5rem",
-            padding: "0.5rem",
-            boxSizing: "border-box",
-            overflowY: "auto",
-            display: "flex",
-            flexDirection: "column",
-            gap: "0.5rem",
-          }}
-        >
-          {messages.map((msg, i) => (
-            <div
-              key={i}
-              style={{
-                width: "100%",
-                display: "flex",
-                justifyContent: msg.sender === "self" ? "end" : "start",
-              }}
+        try{
+            const response = await fetch("",{
+                method:'POST',
+                headers: {
+                    "whatever":"whatever"
+                },
+                body:JSON.stringify({
+                    message:message,
+                })
+            });
+        
+            const data = await response.json();
+
+            setMessages(prev => [...prev, {
+                sender: 'bot',
+                message: data.response,
+                timestamp: new Date(),
+                relavent_actions: data.relavation_actions,
+            }]);
+        } catch (error){
+            setMessages(prev =>[...prev,{
+                sender:'bot',
+                message: "ERROORRRR!!!!",
+                timestamp: new Date(),
+            }])
+
+            // testing bubble. COMMENT THIS OUT & uncomment the finally block
+            // setTimeout(() => {
+            //     setMessages(prev => [...prev, {
+            //         sender: 'bot',
+            //         message: "ERRRORRR!!",
+            //         timestamp: new Date(),
+            //     }]);
+            //     setIsLoading(false);
+            // }, 2000)
+
+        } 
+            finally {
+            setIsLoading(false);
+        }
+    }
+
+    const handleSendClick = () =>{
+        sendMessage(inputValue);
+    }
+
+    const handleEnterPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter'){
+            e.preventDefault(),
+            sendMessage(inputValue)
+        }
+    }
+
+    // quickreplies
+    const [inputValue, setInputValue] = useState("");
+    const isButtonDisabled = inputValue.trim() === '';
+
+    const handleOpening = () => {
+        setIsClosing(false);
+        setOpenWebChat(true);
+    }
+    const handleClosing = () => {
+        setIsClosing(true);
+        setTimeout(() =>{
+            setOpenWebChat(false);
+            setIsClosing(false)
+        }, 300)
+    }
+
+    // time + timestamps
+    const formatTime = (date:Date) => {
+        return date.toLocaleTimeString('en-US',
+            {
+                hour: "numeric",
+                minute:'2-digit',
+                hour12:true,
+            }
+        )
+    }
+    const getGreeting= () =>{
+        const hour = new Date().getHours();
+
+        if (hour < 12){ return 'Good Morning,'}
+            else if (hour <18) {return 'Good Afternoon,'}
+                else {return 'Good Evening,'}
+    }
+
+    const inputRef = useRef<HTMLInputElement>(null);
+    // quickreplies button handlr
+    const handleQuickreply = (text:string) =>{
+        setInputValue(text);
+        inputRef.current?.focus();
+    }
+    // disable scrolling in chatbot when on mobile
+    useEffect(() => {
+       if (isOpenWebChat) {
+           document.body.style.overflow = 'hidden';
+       } else {
+           document.body.style.overflow = 'unset';
+       }
+       
+       return () => {
+           document.body.style.overflow = 'unset';
+       };
+    }, [isOpenWebChat]);
+
+    return(
+        <>
+        {/*open chat button */}
+        {!isOpenWebChat && (
+            <button
+                onClick={handleOpening}
+                className={styles.toggleButton}
             >
-              <div
-                style={{
-                  padding: "0.5rem",
-                  borderRadius: "0.5rem",
-                  backgroundColor: "orange",
-                  maxWidth: "70%",
-                }}
-              >
-                {msg.message}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+                <HiOutlineSparkles size={30}/>
+            </button>
+        )}
+        
+        {/* actual chat window */}
+        {isOpenWebChat && (
+            <div className={`${styles.chatWindow} ${isClosing ? styles.chatWindowClose : styles.chatWindowOpen}`}>
+                {/* header */}
+                <div className={styles.chatHeader}>
+                    <div className={styles.headerContent}>
+                        <img src="/public/ACM Orange 6 compressed square.jpg" className={styles.ACMlogo}/>
+                        <div className={styles.headerText}>
+                            <h3>ACM assistant</h3>
+                            <p>Here to help you!</p>
+                        </div>
 
-      <form
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: "0.5rem",
-        }}
-        onSubmit={handleSubmit}
-      >
-        <input
-          style={{
-            padding: "0.25rem 0.5rem",
-            backgroundColor: "#222",
-            border: "#fff3",
-            color: "white",
-            height: "100%",
-          }}
-          onChange={(e) => handleInputChange(e.target.value)}
-          value={chatInputValue}
-        />
-        <div
-          style={{
-            padding: "0.5rem",
-            backgroundColor: "#222",
-            color: "white",
-            borderRadius: "0.5rem",
-            cursor: "pointer",
-            userSelect: "none",
-            opacity: chatInputValue.length > 0 ? 1 : 0.5,
-          }}
-          onClick={handleSubmit}
-        >
-          Send
-        </div>
-      </form>
-    </div>
-  );
-}
+                    </div>
+                    <button 
+                        className={styles.closeChatButton}
+                        onClick={handleClosing}
+                        >
+                            <MdOutlineClose size={20}/>
+                    </button>
+                </div>
+
+                {/*body */}
+                <div className={styles.messagesContainer}>
+                    <div className={styles.messagesContent}>
+                        <div className={styles.greetingBlock}>
+                            <h3>
+                                {getGreeting()}
+                            </h3>
+                            <h3>
+                                How can I help out?
+                            </h3>
+                            <p>
+                                 {new Date().toLocaleDateString('en-US', {weekday:'long'})}, {formatTime(new Date())}
+                            </p>
+                        </div>
+
+                        {messages.map((msg,index) => (
+                            <div key={index} className={`${styles.messageWrapper} ${msg.sender === 'bot' ? styles.botWrapper : styles.userWrapper}`}>
+                                {msg.sender === 'bot' && (
+                                        <img src="/public/ACM Orange 6 compressed square.jpg" className={styles.botIconContainer}/> 
+                                )}
+                                <div className={styles.messageGroup}>
+                                    <span className={styles.messageTime}>
+                                        {formatTime(msg.timestamp)}
+                                    </span>
+                                    <div className={`${styles.messageBubble} ${msg.sender === 'bot' ? styles.messagesBot : styles.messagesUser}`}>
+                                        <p>{msg.message}</p>
+                                    </div>
+
+
+                                    {msg.relavent_actions && (
+                                        <div className={styles.relevantActions}>
+                                            {msg.relavent_actions.map((action,index) =>(
+                                                <a 
+                                                    className={styles.actionsBubble}
+                                                    key={index}
+                                                    href={action.href}
+                                                    target="_blank"
+                                                >
+                                                    <LuSquareArrowOutUpRight size={16}/> {action.label}
+                                                </a>
+                                            ))}
+
+                                        </div>
+                                    )}
+
+                                </div>
+                            </div>
+                        ))}
+
+                        {isLoading && (
+                            <div className={`${styles.messageWrapper} ${styles.botWrapper}`}>
+                                <img src="/public/ACM Orange 6 compressed square.jpg" className={styles.botIconContainer}/>
+                                <div className={styles.messageGroup}>
+                                    <div className={styles.loadingBubble}>
+                                        <div className={styles.loadingDots}>
+                                            <div className={styles.dot}/>
+                                            <div className={styles.dot}/>
+                                            <div className={styles.dot}/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        <div ref={messagesEndRef}/>
+                        
+                    </div>
+
+
+                </div>
+
+
+                {/* input area*/}
+                <div className={styles.inputArea}>
+                    <div className={styles.inputWrapper}>
+                        <input
+                            ref={inputRef}
+                            type="text"
+                            placeholder="Ask me anything"
+                            className={styles.chatInput}
+                            value={inputValue}
+                            onChange={(e) => setInputValue(e.target.value)}
+                            onKeyPress={handleEnterPress}
+                        />
+                        <button
+                            className={styles.sendButton}
+                            onClick={handleSendClick}
+                            disabled={isButtonDisabled}
+                        >
+                            <LuSend/>
+                        </button>
+                    </div>
+                </div>
+
+                {/* quick replies */}
+                <div className={styles.quickReplies}>
+                    <p className={styles.quickRepliesLabel}>Quick Replies</p>
+                    <div className={styles.quickRepliesButtonContainer}>
+                        <button 
+                            className={styles.quickRepliesButtons}
+                            onClick={()=> handleQuickreply("What events are coming up?")}
+                        >
+                            <HiOutlineSparkles size={12}/>
+                            View events
+                        </button>
+                        <button 
+                            className={styles.quickRepliesButtons}
+                            onClick={()=> handleQuickreply("How do I join ACM?")}
+                        >
+                            <HiOutlineSparkles size={12}/>
+                            How to join
+                        </button>
+                        <button 
+                            className={styles.quickRepliesButtons}
+                            onClick={()=> handleQuickreply("What projects does ACM work on?")}
+                        >
+                            <HiOutlineSparkles size={12}/>
+                            Projects
+                        </button>
+                    </div>
+                    
+                </div>
+
+
+            </div>
+        )}
+        </>
+)}
