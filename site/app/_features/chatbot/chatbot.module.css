@@ -54,12 +54,13 @@
   height: 600px;
   background-color: #181818;
   border-radius: 16px;
-  border: 1px solid #374151;
+  border: 1px solid rgba(var(--color-font-default), 0.25);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  z-index: 4;
+  z-index: 1000;
   overflow: hidden;
+  color: rgba(var(--color-font-default), 1);
 }
 .chatWindowOpen {
   animation: slideUpFade 0.3s ease;
@@ -75,7 +76,7 @@
   background-color: #202020;
   display: flex;
   justify-content: space-between;
-  border-bottom: 1px solid #374151;
+  border-bottom: 1px solid rgba(var(--color-font-default), 0.25);
 }
 
 .closeChatButton {
@@ -83,11 +84,12 @@
   border: none;
   cursor: pointer;
   display: flex;
-  transition: color 0.2s;
+  transition: opacity 0.2s;
   padding: 5px;
+  color: rgba(var(--color-font-default), 1);
 }
 .closeChatButton:hover {
-  color: #374151;
+  opacity: 0.5;
 }
 
 .headerContent {
@@ -97,14 +99,14 @@
 }
 
 .ACMlogo {
-  width: 35px;
-  height: 35px;
+  width: 1.75rem;
+  height: 1.75rem;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   object-fit: contain;
-  background-color: black;
+  background-color: rgba(var(--color-neutral-1000), 1);
 }
 
 /* messages content */
@@ -115,8 +117,10 @@
   background: linear-gradient(to bottom, #111724, #181818 250px);
 }
 .greetingBlock {
-  border-bottom: 1px solid #374151;
+  border-bottom: 1px solid rgba(var(--color-neutral-500), 0.5);
   padding: 20px 30px;
+  text-align: center;
+  color: rgba(var(--color-font-default), 1);
 }
 .greetingBlock p {
   font-size: 13px;
@@ -124,11 +128,13 @@
 }
 
 .botIconContainer {
-  width: 30px;
-  height: 30px;
+  width: 1.5rem;
+  height: 1.5rem;
   border-radius: 50%;
   margin-top: 10px;
   padding-left: 2px;
+  object-fit: contain;
+  background-color: rgba(var(--color-neutral-1000), 1);
 }
 
 /* .exampleMsg{
@@ -169,21 +175,26 @@
 }
 
 .messageBubble {
-  padding: 10px;
+  padding: 0.6rem;
   width: fit-content;
   word-wrap: break-word;
+  border-radius: 1rem;
 }
 
 .messageBubble p {
-  font-size: 14px;
+  font-size: 0.8rem;
 }
 
+/*
+* TODO: precise colors are hard to manage. 
+* Will deal with this later.
+*/
 .messagesBot {
   background-color: #1f2937;
   border: 1px solid #6b788a9a;
   justify-content: flex-start;
   color: white;
-  border-radius: 2px 18px 18px 18px;
+  border-start-start-radius: 0.2rem;
   text-align: left;
   width: fit-content;
   /* max-width: 60%; */
@@ -191,16 +202,18 @@
 
 .messagesUser {
   text-align: left;
-  background-color: #f07800;
+  background-color: rgba(var(--color-font-primary), 1);
   color: white;
-  border-radius: 18px 2px 18px 18px;
+  border-start-end-radius: 0.2rem;
   width: fit-content;
   /* max-width: 60%; */
 }
 
 .messageTime {
   display: block;
-  font-size: 12px;
+  font-size: 0.6rem;
+  opacity: 0.5;
+  margin-bottom: 0.2rem;
 }
 
 .messagesBot .messageTime {
@@ -220,10 +233,9 @@
 }
 
 .actionsBubble {
-  background-color: #fff;
-  border: 2px solid #f07800;
+  background-color: rgba(var(--color-font-primary), 1);
+  border: 2px solid rgba(var(--color-font-default), 0.25);
   border-radius: 18px;
-  color: #f07800;
   padding: 12px 14px;
   width: 100%;
   box-sizing: border-box;
@@ -237,9 +249,8 @@
 }
 
 .actionsBubble:hover {
-  background-color: #f07800;
-  color: #fff;
-  transform: scale(1.05);
+  opacity: 0.75;
+  transform: scale(1.025);
 }
 
 /* loading bubble */
@@ -282,9 +293,9 @@
 }
 
 .inputArea {
-  border-top: 1px solid #374151;
+  border-top: 1px solid rgba(var(--color-font-default), 0.25);
   padding: 8px 16px;
-  border-bottom: 1px solid #374151;
+  border-bottom: 1px solid rgba(var(--color-font-default), 0.25);
 }
 
 .inputWrapper {
@@ -292,13 +303,15 @@
   align-items: center;
   background-color: #1f2937;
   border-radius: 24px;
-  padding: 8px 16px;
-  border: 2px solid #1f2937;
-  transition: border-color 0.3s ease;
+  padding: 0.1rem 1rem;
+  padding-right: 0.5rem;
+  border: 1px solid rgba(var(--color-font-default), 0.25);
+  transition: border-color 0.2s ease;
+  position: relative;
 }
 
 .inputWrapper:focus-within {
-  border: 2px solid #f59e0b;
+  border: 1px solid rgba(var(--color-font-primary), 0.75);
 }
 
 .chatInput {
@@ -308,15 +321,24 @@
   background-color: transparent;
 }
 
+.chatInput:focus {
+  /* undoes global input styling */
+  outline: initial;
+}
+
 .sendButton {
-  background-color: #f59e0b;
+  background-color: rgba(var(--color-font-primary), 1);
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
   border-radius: 50%;
-  padding: 8px;
+  padding: 0.5rem;
   border: none;
+  position: absolute;
+  right: 0.5rem;
+  cursor: pointer;
 }
 .sendButton:disabled {
   cursor: not-allowed;
@@ -334,33 +356,35 @@
 .quickRepliesLabel {
   font-size: 12px;
   text-align: left;
-  padding: 5px 10px;
+  padding: 0.2rem 0.5rem;
 }
 
 .quickRepliesButtonContainer {
   display: flex;
-  gap: 10px;
+  gap: 0.5rem;
   margin-bottom: 8px;
 }
 
 .quickRepliesButtons {
   background: #202020;
-  border: 1px solid #ffffff;
-  font-size: 12px;
-  border-radius: 30px;
+  border: 1px solid rgba(var(--color-font-default), 1);
+  color: rgba(var(--color-font-default), 1);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  border-radius: 2rem;
   cursor: pointer;
   align-items: center;
   gap: 6px;
-  transition: all 0.25s ease-in-out;
+  transition: all 0.1s ease-in-out;
   display: flex;
 }
 .quickRepliesButtons:hover {
   transform: scale(1.05);
-  border-color: #f07800;
-  color: #f07800;
+  border-color: rgba(var(--color-font-primary), 1);
+  color: rgba(var(--color-font-primary), 1);
 }
 
-@media only screen and (min-width: 768px) and (max-width: 1024px) {
+@media only screen and (max-width: 992px) {
   .chatWindow {
     max-height: 100%;
     height: 100vh;

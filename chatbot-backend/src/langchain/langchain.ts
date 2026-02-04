@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
 import { env_vars } from '../tools/env/envVars';
+import { LogMessage } from '../log/log';
 
 const API_KEYS = env_vars.AI_APIKEYS;
 let keyIndex = 0;

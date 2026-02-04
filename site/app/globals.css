@@ -96,6 +96,10 @@ a {
 	align-items: center;
 }
 
+.chatbotDisableScrollOnMobile {
+  overflow-y: initial;
+}
+
 
 @media (max-width: 1200px) {
   :root {
@@ -109,6 +113,9 @@ a {
   }
   .SectionInner {
     padding: 0rem 1rem;
+  }
+  .chatbotDisableScrollOnMobile {
+    overflow-y: hidden;
   }
 }
 

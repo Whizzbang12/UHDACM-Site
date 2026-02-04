@@ -16,6 +16,7 @@ import {
   VectorDBPageMetadataAction,
 } from "@shared/types/vectorDB/vectorDBTypes";
 import { LogMessage } from "../log/log";
+import { QueryResponse } from "@shared/types/query/queryTypes";
 
 const produceDocumentObject = (
   document: string,
@@ -74,10 +75,7 @@ const produceDocumentObject = (
   return documentObject;
 };
 
-interface QueryResponse {
-  response: string;
-  relevant_actions: VectorDBPageMetadataAction[];
-}
+
 
 function checkQueryResponse(obj: unknown): asserts obj is QueryResponse {
   if (typeof obj !== "object" || obj === null) {
@@ -151,7 +149,7 @@ export const processQuery = async (query: string) => {
       // console.log(tries, 'trying to fix issue', (e as Error).message);
       currentResponse = await handleQuestion(
         `${currentResponse}\nFix Error: ${(e as Error).message}`,
-        "gemma-3-1b-it",
+        // "gemma-3-1b-it",
       );
     }
   }
@@ -160,8 +158,10 @@ export const processQuery = async (query: string) => {
     function: "processQuery",
     lastResponse: currentResponse
   });
-  return {
+  
+  const res: QueryResponse = {
     response: "Failed to generate response",
     relevant_actions: [],
   };
+  return res;
 };

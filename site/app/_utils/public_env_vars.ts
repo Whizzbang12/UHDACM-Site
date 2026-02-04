@@ -20,6 +20,8 @@ export const public_env_vars = {
   NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY!,
   NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST!,
 
+  // chatbot
+  NEXT_PUBLIC_CHATBOT_ENDPOINT: process.env.NEXT_PUBLIC_CHATBOT_ENDPOINT!
 } as const;
 
 export type public_env_vars_type = typeof public_env_vars;
