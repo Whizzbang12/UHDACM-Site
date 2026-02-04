@@ -227,7 +227,7 @@ export type SiteEvent = {
   descriptionShort: string;
   descriptionFull: BlocksContent;
   location: string;
-  gallery?: ObjectUnknown;
+  gallery?: ObjectUnknown; // TODO: define more specifically
   organizations?: Organization[];
 };
 

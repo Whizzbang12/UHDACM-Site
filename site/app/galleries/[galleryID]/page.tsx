@@ -9,7 +9,7 @@ import { NavbarPadding } from "@/app/_pageRenderer/PageRenderer";
 import ShareButton from "@/app/_components/Button/CommonVariants/ShareButton";
 import HeroSingleImage from "@/app/_sections/SplitHeroSection/HeroSingleImage/HeroSingleImage";
 import { generateGalleryShareText } from "@/app/_utils/types/cms/cmsTypeTools";
-import { WrapInNavbarAndFooter } from "@/app/_utils/tsxTools";
+import { WrapInNavbarAndFooter } from "@/app/_utils/tsxServerTools";
 
 type EventPageParams = Promise<{
   galleryID: string;
@@ -52,6 +52,9 @@ export default async function EventPage({
   }
 
   const media = event.gallery.media || [];
+  if (!Array.isArray(media)) {
+    return <Galleries404 />;
+  }
 
   const validMedia: StrapiPicture[] = [];
   for (const pic of media) {

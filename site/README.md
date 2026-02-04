@@ -7,10 +7,21 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 **First**, add environment variables
 ```
 NEXT_PUBLIC_CMS_URL=http://localhost:1337
-
 NEXT_PUBLIC_SELF_URL=http://localhost:3000
 
 STRAPI_API_TOKEN=<add-later>
+CMS_AUTH_TOKEN=<add-later> # token used to tell strapi request is authorized. See CMS readme for more.
+
+
+# this is used if auth is enabled. For now, its used on test server to allow whitelisted users only.
+NEXT_PUBLIC_ENABLE_AUTH=false
+CLERK_SECRET_KEY=<key>
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=<p-key>
+
+# Real user monitoring is used here. Usually only enabled in prod.
+NEXT_PUBLIC_ENABLE_RUM=false
+NEXT_PUBLIC_POSTHOG_KEY=<ph-key>
+NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
 ```
 
 The Strapi API token is obtainable through the StrapiCMS (Set that up first)

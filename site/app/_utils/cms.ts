@@ -1,8 +1,11 @@
+'use server'
 import { buildCMSFetchURL, cmsPageFetchParams } from "@shared/types/cms/CMSFuncs";
 import {
   cmsSingleTypePage,
 } from "@shared/types/cms/CMSTypes";
 import { fetchableCMSCollection } from "@shared/types/cms/CMSTypes";
+import { private_env_vars } from "./private_env_vars";
+import { public_env_vars } from "./public_env_vars";
 
 
 // TODO: swap with entity service
@@ -12,7 +15,7 @@ export async function fetchCMS(
   additionalTags?: fetchableCMSCollection[] | "any",
 ) {
   try {
-    const { url, dependencyTags } = buildCMSFetchURL(`${process.env.NEXT_PUBLIC_CMS_URL}`, path, params, additionalTags);
+    const { url, dependencyTags } = buildCMSFetchURL(`${public_env_vars.NEXT_PUBLIC_CMS_URL}`, path, params, additionalTags);
     if (!url) {
       console.error('77cshias', path, params, additionalTags)
       throw new Error('Could not generate fetch url');
@@ -24,7 +27,7 @@ export async function fetchCMS(
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.STRAPI_API_TOKEN}`,
+        Authorization: `Bearer ${private_env_vars.STRAPI_API_TOKEN}`,
       },
     });
     if (!res.ok) {

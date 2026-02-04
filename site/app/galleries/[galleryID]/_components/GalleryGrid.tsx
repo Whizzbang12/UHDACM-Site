@@ -9,10 +9,11 @@ import { StrapiPicture } from "@shared/types/cms/CMSTypes";
 
 import styles from './GalleryGrid.module.css';
 import { TryGetImageFormatUrl } from "@/app/_utils/types/cms/cmsTypeTools";
+import { usePublicEnv } from "@/app/_context/PublicEnvContext/PublicEnvContext";
 
 export default function GalleryGrid({ media }: { media: StrapiPicture[] }) {
   const dispatch = useDispatch<AppDispatch>();
-  
+  const public_env = usePublicEnv();
   const mediaArray = media;
 
   // const mediaArray = [...media, ...media, ...media];
@@ -23,7 +24,7 @@ export default function GalleryGrid({ media }: { media: StrapiPicture[] }) {
         items: mediaArray.map((img, i) => (
           <CarouselFullScreenImage
             key={img.id || i}
-            src={`${TryGetImageFormatUrl(img, 'large')}`}
+            src={`${TryGetImageFormatUrl(img, 'large', public_env.NEXT_PUBLIC_CMS_URL)}`}
             alt={img.alternativeText || `Gallery image ${i + 1}`}
             caption={img.caption}
           />
@@ -31,7 +32,7 @@ export default function GalleryGrid({ media }: { media: StrapiPicture[] }) {
         thumbnails: mediaArray.map((img, i) => (
           <CarouselThumbnail
             key={img.id || i}
-            src={`${TryGetImageFormatUrl(img, 'thumbnail')}`}
+            src={`${TryGetImageFormatUrl(img, 'thumbnail', public_env.NEXT_PUBLIC_CMS_URL)}`}
             alt={img.alternativeText || `Gallery image ${i + 1}`}
           />
         )),
@@ -55,7 +56,7 @@ export default function GalleryGrid({ media }: { media: StrapiPicture[] }) {
         {mediaArray.map((img, i) => (
           <img
             key={i}
-            src={`${TryGetImageFormatUrl(img, 'small')}`}
+            src={`${TryGetImageFormatUrl(img, 'small', public_env.NEXT_PUBLIC_CMS_URL)}`}
             alt={img.alternativeText || `Gallery image ${i + 1}`}
             style={{
               width: "100%",

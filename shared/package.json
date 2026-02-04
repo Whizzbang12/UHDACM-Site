@@ -1,6 +1,7 @@
 {
   "devDependencies": {
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "vitest": "^4.0.18"
   },
   "dependencies": {
     "@strapi/blocks-react-renderer": "^1.0.2"

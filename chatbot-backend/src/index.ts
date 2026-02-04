@@ -1,8 +1,7 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-import { queryCollection } from "./context/context";
-import { handleQuestion } from "./langchain/langchain";
 import { processQuery } from "./query/query";
+import { LogMessage } from "./log/log";
 
 const app = express();
 const PORT = 4000;
@@ -29,11 +28,19 @@ app.use(cors({ origin: allowedOrigins }));
 app.post(
   "/chat",
   async (req: Request<{}, {}, ChatRequestBody>, res: Response) => {
-    const { query } = req.body;
+    try {
+      const { query } = req.body;
 
-    const response = await processQuery(query);
+      const response = await processQuery(query);
 
-    return res.status(200).json({ response: response });
+      return res.status(200).json({ response: response });
+    } catch (e) {
+      LogMessage((e as Error).message, {
+        'file': 'index.ts',
+        'endpoint': '/chat'
+      });
+      return res.status(400).json({ error: "server error" });
+    }
   },
 );
 

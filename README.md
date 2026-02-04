@@ -41,4 +41,4 @@ Contains shared types and utility functions used across multiple packages to ens
 ## How to Run
 The run scripts for each part of the project are located in their respective folder's **readme**. 
 
-To run the entire project, ensure that all parts (e.g., `./cms` and `./site`) are running simultaneously.
+To run the entire project, ensure that all parts (e.g., `./cms`, `./site`, etc.) are running simultaneously.

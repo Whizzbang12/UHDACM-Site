@@ -10,12 +10,14 @@ import { CarouselFullScreenImage } from "@/app/galleries/[galleryID]/_components
 import { CarouselThumbnail } from "@/app/galleries/[galleryID]/_components/CarouselThumbnail";
 import { TryGetImageFormatUrl } from "@/app/_utils/types/cms/cmsTypeTools";
 import { isStrapiPicture } from "@shared/types/cms/CMSCheck";
+import { usePublicEnv } from "@/app/_context/PublicEnvContext/PublicEnvContext";
 
 export default function HeroImageCollection({
   images,
 }: {
   images: StrapiPicture[];
 }) {
+  const public_env = usePublicEnv();
   if (!images || images.length === 0) {
     return null;
   }
@@ -32,7 +34,7 @@ export default function HeroImageCollection({
         items: mediaArray.map((img, i) => (
           <CarouselFullScreenImage
             key={img.id || i}
-            src={`${isStrapiPicture(img) ? TryGetImageFormatUrl(img, 'large') : undefined}`}
+            src={`${isStrapiPicture(img) ? TryGetImageFormatUrl(img, 'large', public_env.NEXT_PUBLIC_CMS_URL) : undefined}`}
             alt={img.alternativeText || `Gallery image ${i + 1}`}
             caption={img.caption}
           />
@@ -40,7 +42,7 @@ export default function HeroImageCollection({
         thumbnails: mediaArray.map((img, i) => (
           <CarouselThumbnail
             key={img.id || i}
-            src={`${isStrapiPicture(img) ? TryGetImageFormatUrl(img, 'thumbnail') : undefined}`}
+            src={`${isStrapiPicture(img) ? TryGetImageFormatUrl(img, 'thumbnail', public_env.NEXT_PUBLIC_CMS_URL) : undefined}`}
             alt={img.alternativeText || `Gallery image ${i + 1}`}
           />
         )),
@@ -66,7 +68,7 @@ export default function HeroImageCollection({
         style={{ position: "relative" }}
       >
         <img
-          src={`${isStrapiPicture(images[0]) ? TryGetImageFormatUrl(images[0], 'medium') : undefined}`}
+          src={`${isStrapiPicture(images[0]) ? TryGetImageFormatUrl(images[0], 'medium', public_env.NEXT_PUBLIC_CMS_URL) : undefined}`}
           alt={images[0].alternativeText}
           className={HeroSingleImageStyles.image}
           style={{ zIndex: 10 }}

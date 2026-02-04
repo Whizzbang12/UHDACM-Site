@@ -195,3 +195,14 @@ export async function DBDeleteAllTestDocuments() {
     })
   );
 }
+
+
+// deletes all test data in the database before any tests are run
+export async function DeleteTestData() {
+  // finds them by getting documents with DocumentTestKey, which is only set on test data
+  await Promise.all(
+      collectionNames.map(async (collectionName) => {
+          await DBDelete(collectionName, [[DocumentTestKey, '!=', '']])
+      })
+  );
+}

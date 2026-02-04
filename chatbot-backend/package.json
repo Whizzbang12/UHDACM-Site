@@ -6,7 +6,8 @@
     "build": "tsc",
     "start": "node ./dist",
     "chroma-server": "chroma run",
-    "ingestTest": "nodemon --exec ts-node -r tsconfig-paths/register ./src/context/ingester.ts"
+    "ingestTest": "nodemon --exec ts-node -r tsconfig-paths/register ./src/context/ingester.ts",
+    "test": "vitest log.test.ts"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
@@ -63,6 +64,7 @@
     "undefsafe": "^2.0.5",
     "undici-types": "^7.16.0",
     "v8-compile-cache-lib": "^3.0.1",
+    "vitest": "^4.0.18",
     "yn": "^3.1.1"
   },
   "keywords": [],

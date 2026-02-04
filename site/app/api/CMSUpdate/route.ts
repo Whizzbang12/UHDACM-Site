@@ -1,4 +1,5 @@
 
+import { private_env_vars } from "@/app/_utils/private_env_vars";
 import { EqualsTimed } from "@shared/tools";
 import { isCMSCollectionSingular, isCMSSingleType, isCMSSingleTypePage } from "@shared/types/cms/CMSCheck";
 import { revalidateTag } from "next/cache";
@@ -6,7 +7,7 @@ import { revalidateTag } from "next/cache";
 export async function POST(req: Request) {
   const headers = req.headers;
   const CMSAuthToken = headers.get('authorization');
-  if (!await EqualsTimed(CMSAuthToken, process.env.CMS_AUTH_TOKEN, 1000)) {
+  if (!await EqualsTimed(CMSAuthToken, private_env_vars.CMS_AUTH_TOKEN, 1000)) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 403 });
   }
 

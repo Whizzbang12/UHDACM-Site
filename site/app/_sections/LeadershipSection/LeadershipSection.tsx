@@ -4,6 +4,7 @@ import { Person, SocialObj } from "@shared/types/cms/CMSTypes";
 import { TryGetImageFormatUrl } from "@/app/_utils/types/cms/cmsTypeTools";
 import { isValidLeadership } from "@shared/types/cms/CMSCheck";
 import { isPerson } from "@shared/types/cms/CMSCheck";
+import { public_env_vars } from "@/app/_utils/public_env_vars";
 
 export default async function LeadershipSection({ sectionID }: { sectionID?: string }) {
   const res = await fetchCMS("leadership", {
@@ -49,7 +50,7 @@ export default async function LeadershipSection({ sectionID }: { sectionID?: str
             <PersonTile
               key={idx}
               imgCoverOrContain="cover"
-              img={`${person.picture ? TryGetImageFormatUrl(person.picture, 'medium') : ''}`}
+              img={`${person.picture ? TryGetImageFormatUrl(person.picture, 'medium', public_env_vars.NEXT_PUBLIC_CMS_URL) : ''}`}
               previewTitle={person.nameShort}
               fullTitle={person.name}
               previewSubTitle={person.roleShort}

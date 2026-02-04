@@ -26,3 +26,5 @@ export async function EqualsTimed(val: any, val2: any, time: number) {
   }
   return true;
 }
+
+

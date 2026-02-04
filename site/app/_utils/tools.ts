@@ -134,12 +134,12 @@ export function CalendarLinkOutlook({
  * @param path
  * @returns
  */
-export function ProduceCMSResourceURL(path?: string) {
+export function ProduceCMSResourceURL(cmsUrl: string, path?: string) {
   if (!path) {
     return undefined;
   }
   if (path.at(0) == "/") {
-    return `${process.env.NEXT_PUBLIC_CMS_URL}${path}`;
+    return `${cmsUrl}${path}`;
   }
   return path;
 }

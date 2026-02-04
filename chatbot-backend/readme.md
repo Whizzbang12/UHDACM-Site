@@ -22,6 +22,11 @@ CHROMA_DB_HOST=localhost
 CHROMA_DB_PORT=5477
 CHROMA_DB_COLLECTION_NAME=primary
 PORT=4000
+
+# if logging enabled, will use betterstack logger.
+ENABLE_LOGGER=false
+COLLECTOR_SOURCE_SECRET=<secret>
+COLLECTOR_INGESTING_HOST=<https-host>
 ```
 
 - `GOOGLE_API_KEYS`: Comma-separated list of Google API keys.

@@ -11,7 +11,7 @@ import { ProduceCMSResourceURL } from "../../tools";
  * @param format 
  * @returns 
  */
-export function TryGetImageFormatUrl(img: StrapiPicture, format: keyof StrapiPicture["formats"]) {
+export function TryGetImageFormatUrl(img: StrapiPicture, format: keyof StrapiPicture["formats"], cmsUrl: string) {
   let url: string = '';
   if (!img) return undefined;
   if (img.formats && img.formats[format]) {
@@ -20,7 +20,7 @@ export function TryGetImageFormatUrl(img: StrapiPicture, format: keyof StrapiPic
     url = img.url;
   }
 
-  const resourceURL = ProduceCMSResourceURL(url) || undefined;
+  const resourceURL = ProduceCMSResourceURL(cmsUrl, url) || undefined;
   return resourceURL;
 }
 

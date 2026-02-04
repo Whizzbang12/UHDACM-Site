@@ -3,6 +3,7 @@ import { env_vars } from "../tools/env/envVars";
 import { vectorDBEmptyCollectionMarkerDocument } from "@shared/types/vectorDB/vectorDBData";
 import { VectorDBBaseMetadata } from "@shared/types/vectorDB/vectorDBTypes";
 import { convertSafeMetadataToVectorDBMetadata } from "@shared/types/vectorDB/vectorDBFuncs";
+import { LogMessage } from "../log/log";
 
 // Define the collection name
 const collectionName = env_vars.CHROMA_DB_COLLECTION_NAME;
@@ -11,11 +12,13 @@ const nResults = 5; // Define the number of results globally
 // Initialize Chroma client
 const client = new ChromaClient({
   host: env_vars.CHROMA_DB_HOST,
-  port: env_vars.CHROMA_DB_PORT
+  port: env_vars.CHROMA_DB_PORT,
 });
 
 // Function to query the collection and return related items as a string array
-export async function queryCollection(query: string): Promise<[string, VectorDBBaseMetadata][]> {
+export async function queryCollection(
+  query: string,
+): Promise<[string, VectorDBBaseMetadata][]> {
   try {
     // Get the collection
     const collection = await client.getCollection({ name: collectionName });
@@ -27,9 +30,6 @@ export async function queryCollection(query: string): Promise<[string, VectorDBB
     });
 
     // Extract and return the results as a string array
-    
-    const documents = queryRes.documents[0];
-    // const metadatas = queryRes.metadatas[0];
 
     const documentMetadataArray: [string, VectorDBBaseMetadata][] = [];
     for (let i = 0; i < queryRes.documents[0].length; i++) {
@@ -37,29 +37,35 @@ export async function queryCollection(query: string): Promise<[string, VectorDBB
 
       if (!val) {
         // idk how this would happen
-          console.error('Ran out of values', JSON.stringify(queryRes, null, 2));
+        console.error("Ran out of values", JSON.stringify(queryRes, null, 2));
         break;
       }
       if (val == vectorDBEmptyCollectionMarkerDocument) {
         // skip empty documents
         continue;
       }
-      
+
       try {
         const metadata = queryRes.metadatas[0][i];
         if (!metadata) {
           // idk how this is possible
-          console.error('Ran out of metadatas', JSON.stringify(queryRes, null, 2));
+          console.error(
+            "Ran out of metadatas",
+            JSON.stringify(queryRes, null, 2),
+          );
           break;
         }
         const convMetadata = convertSafeMetadataToVectorDBMetadata(metadata);
         documentMetadataArray.push([val, convMetadata]);
-      } catch {
-        // metadata is not valid
+      } catch (e) {
+        LogMessage(`${(e as Error).message}`, {
+          function: "queryCollection",
+          hint: 'convMetadata'
+        });
         break;
       }
     }
-    
+
     // console.log(documents);
     // console.log(metadatas);
     // console.log(documentMetadataArray)
@@ -67,6 +73,9 @@ export async function queryCollection(query: string): Promise<[string, VectorDBB
     return documentMetadataArray;
   } catch (error) {
     console.error("Error querying the collection:", error);
+    LogMessage((error as Error).message, {
+      function: "queryCollection",
+    });
     return [];
   }
 }

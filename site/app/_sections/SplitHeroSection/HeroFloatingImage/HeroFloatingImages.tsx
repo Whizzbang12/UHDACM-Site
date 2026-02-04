@@ -1,7 +1,10 @@
+'use client'
+
 import { StrapiPicture } from '@shared/types/cms/CMSTypes';
 import HeroSingleImageStyles from '../HeroSingleImage/HeroSingleImage.module.css';
 import { TryGetImageFormatUrl } from '@/app/_utils/types/cms/cmsTypeTools';
 import { isStrapiPicture } from '@shared/types/cms/CMSCheck';
+import { usePublicEnv } from '@/app/_context/PublicEnvContext/PublicEnvContext';
 
 interface Props {
   images: StrapiPicture[];
@@ -82,6 +85,8 @@ const floatTime = 3;
 export default function HeroFloatingImages({ images }: Props) {
   const availableFloatingImages = floatingImages.slice(0, images.length);
   const maxWidth = Math.max(...availableFloatingImages.map((img) => img.width));
+  const public_env = usePublicEnv();
+  
   return (
     <div className={HeroSingleImageStyles.container} style={{position: 'relative'}}>
       <div className={HeroSingleImageStyles.imageWrapper}>
@@ -89,7 +94,7 @@ export default function HeroFloatingImages({ images }: Props) {
           return (
             <img
               key={index}
-              src={isStrapiPicture(images[index]) ? TryGetImageFormatUrl(images[index], index == 0 ? 'medium' : 'small') : undefined}
+              src={isStrapiPicture(images[index]) ? TryGetImageFormatUrl(images[index], index == 0 ? 'medium' : 'small', public_env.NEXT_PUBLIC_CMS_URL) : undefined}
               alt={`floatingImg${index}`}
               style={{
                 userSelect: "none",

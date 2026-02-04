@@ -1,9 +1,10 @@
-'use client'
+"use client";
 
 import React from "react";
 import Link from "next/link";
 import { FunctionUnknown } from "@shared/types/general/generalTypes";
 import styles from "./Button.module.css";
+import { usePostHog } from "posthog-js/react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   onClick?: FunctionUnknown;
@@ -15,22 +16,47 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const defaultProps = {
-  className: [styles.Button, styles['LinkStyle']].join(' '),
+  className: [styles.Button, styles["LinkStyle"]].join(" "),
   tabIndex: 0,
 };
 
-const Button: React.FC<ButtonProps> = ({ onClick, href, target, children, style, className, ...props }) => {
-  const classes = [defaultProps.className, styles[className||'']].filter(Boolean).join(' ');
+const Button: React.FC<ButtonProps> = ({
+  onClick,
+  href,
+  target,
+  children,
+  style,
+  className,
+  ...props
+}) => {
+  const posthog = usePostHog();
+
+  const classes = [defaultProps.className, styles[className || ""]]
+    .filter(Boolean)
+    .join(" ");
   if (href) {
     return (
-      <Link {...defaultProps} href={href} style={style} className={classes} target={target}>
+      <Link
+        {...defaultProps}
+        onClick={onClick}
+        href={href}
+        style={style}
+        className={classes}
+        target={target}
+      >
         {children}
       </Link>
     );
   }
 
   return (
-    <button {...defaultProps} onClick={onClick} style={style} className={classes} {...props}>
+    <button
+      {...defaultProps}
+      onClick={onClick}
+      style={style}
+      className={classes}
+      {...props}
+    >
       {children}
     </button>
   );

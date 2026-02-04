@@ -10,12 +10,7 @@ import {
   SplitHeroColumn,
   StrapiPicture,
 } from "@shared/types/cms/CMSTypes";
-import {
-  DBCreate,
-  DBDeleteWithID,
-  DBGet,
-  DBSetWithID,
-} from "../db/db";
+import { DBCreate, DBDeleteWithID, DBGet, DBSetWithID } from "../db/db";
 import { DBTicket } from "@shared/types/ticket/ticketTypes";
 import { checkDBTicket } from "@shared/types/ticket/ticketCheck";
 import {
@@ -57,8 +52,12 @@ import {
   VectorDBQnAMetadata,
   VectorDBSiteInfoMetadata,
 } from "@shared/types/vectorDB/vectorDBTypes";
-import { convertSiteEventToPartialSiteEvent, convertVectorDBMetadataToSafeMetadata } from "@shared/types/vectorDB/vectorDBFuncs";
+import {
+  convertSiteEventToPartialSiteEvent,
+  convertVectorDBMetadataToSafeMetadata,
+} from "@shared/types/vectorDB/vectorDBFuncs";
 import { vectorDBEmptyCollectionMarkerDocument } from "@shared/types/vectorDB/vectorDBData";
+import { LogMessage } from "../log/log";
 
 const maxTicketRetries = 3;
 
@@ -69,7 +68,6 @@ const cmsCollections = [
   ...cmsSingleTypePages,
 ]; // all the single type collections in the cms
 
-
 class VectorDBWriter {
   private client = new ChromaClient({
     host: env_vars.CHROMA_DB_HOST,
@@ -79,16 +77,20 @@ class VectorDBWriter {
   private state: VectorDBWriterState = "initializing";
 
   constructor() {
-    if (GlobalVectorDBWriter)
-      throw new Error(
-        "You cannot create more than on VectorDBWriter right now.",
-      );
+    if (GlobalVectorDBWriter) {
+      const err = "You cannot create more than on VectorDBWriter right now.";
+      LogMessage(err, {
+        file: "writer.ts",
+        hint: "constructor",
+      });
+      throw new Error(err);
+    }
     this.state = "idle";
     this.healthCheck();
   }
 
   private async healthCheck() {
-    if (this.state != "idle") return;
+    if (!this.isIdle()) return;
     console.log("health checking");
     this.state = "health_check";
 
@@ -97,7 +99,12 @@ class VectorDBWriter {
       vectorDBCollection = await this.client.getCollection({
         name: env_vars.CHROMA_DB_COLLECTION_NAME,
       });
-    } catch {
+    } catch (e) {
+      LogMessage((e as Error).message, {
+        file: "writer.ts",
+        hint: "healthCheck getCollection",
+        chroma_collection_name: env_vars.CHROMA_DB_COLLECTION_NAME
+      });
       vectorDBCollection = await this.client.createCollection({
         name: env_vars.CHROMA_DB_COLLECTION_NAME,
       });
@@ -123,6 +130,10 @@ class VectorDBWriter {
       }
       await Promise.all(promises);
     } catch (e) {
+      LogMessage((e as Error).message, {
+        file: "writer.ts",
+        hint: "healthCheck promises",
+      });
       console.error("error while health checking", (e as Error).message);
     }
 
@@ -132,7 +143,7 @@ class VectorDBWriter {
 
   // WARNING: SPAGHETTI CODE BELOW (do not touch unless you know what you are doing)
   async write() {
-    if (this.state != "idle") return;
+    if (!this.isIdle()) return;
     this.state = "writing";
     let ticketsDone = 0;
     while (true) {
@@ -154,6 +165,11 @@ class VectorDBWriter {
           checkDBTicket(ticket);
         } catch (e) {
           await DBDeleteWithID("ticket", ticket.id);
+          LogMessage("ticket error", {
+            file: "writer.ts",
+            hint: "processTicket checkDBTicket",
+            ticket
+          });
           console.error("ticket error", (e as Error).message);
           continue;
         }
@@ -161,6 +177,10 @@ class VectorDBWriter {
         ticketsDone += 1;
         // process ticket
       } catch (e) {
+        LogMessage((e as Error).message, {
+          file: "writer.ts",
+          hint: "write ticket loop",
+        });
         console.log(`Problem ${(e as Error).message}`);
       }
     }
@@ -179,13 +199,21 @@ class VectorDBWriter {
     // this can result in a forever loop.
     try {
       await DBSetWithID("ticket", ticket.id!, ticket);
-    } catch {
+    } catch (e) {
+      LogMessage((e as Error).message, {
+        file: "writer.ts",
+        hint: "processTicket increment",
+      });
       console.error("failed to increment ticket");
       return false;
     }
 
     if (ticket.tries > maxTicketRetries) {
       console.log("exceeded limit");
+      LogMessage("ticket exceeded limit", {
+        file: "writer.ts",
+        hint: "processTicket maxTicketRetries",
+      });
       return false;
     }
 
@@ -202,8 +230,13 @@ class VectorDBWriter {
           cmsPageFetchParams,
         );
         if (!url) {
-          // TODO: fails silently
-          console.error("udasidaid", url);
+          LogMessage("no URL generated", {
+            file: "writer.ts",
+            hint: "processTicket buildCMSFetchURL",
+            collection,
+            cmsURL: env_vars.CMS_URL,
+            cmsPageFetchParams: cmsPageFetchParams,
+          });
           return false;
         }
 
@@ -256,8 +289,7 @@ class VectorDBWriter {
             pageURL += "qnas";
             break;
         }
-        
-        
+
         for (const section of sections) {
           if (isValidSiteSectionLeadership(section)) {
             // leadership section adds nothing semantically
@@ -307,7 +339,7 @@ class VectorDBWriter {
                 const { textBlock } = component;
                 const actions: VectorDBPageMetadataAction[] = [];
                 let res = "";
-                res += `${textBlock.preheader || ''}. ${textBlock.header || ''}. ${textBlock.subheader || ''}.`;
+                res += `${textBlock.preheader || ""}. ${textBlock.header || ""}. ${textBlock.subheader || ""}.`;
                 if (textBlock.buttons) {
                   for (const button of textBlock.buttons) {
                     actions.push({
@@ -347,8 +379,14 @@ class VectorDBWriter {
                 // let res = `Form: ${component.form.iFrameFormUrl}`;
                 return ["A form's in this section", []];
               } else {
-                // TODO: fails silently
-                console.error("unhandled component");
+                LogMessage("Ticket: Unhandled component", {
+                  file: "writer.ts",
+                  hint: "processTicket processComps siteSectionSplitHero",
+                  collection,
+                  cmsURL: env_vars.CMS_URL,
+                  cmsPageFetchParams: cmsPageFetchParams,
+                });
+                // console.error("unhandled component");
                 return ["", []];
               }
             };
@@ -370,6 +408,12 @@ class VectorDBWriter {
             };
             collectionDataMetadataArray.push([sectionData, pageMetaData]);
           } else {
+            LogMessage("Ticket: Unhandled section", {
+              file: "writer.ts",
+              hint: "processTicket processComps for section of sections",
+              collection,
+              section: section,
+            });
             console.error(
               "unhanlded section",
               JSON.stringify(section, null, 2),
@@ -379,12 +423,14 @@ class VectorDBWriter {
         const pageMetadata: VectorDBPageMetadata = {
           collection: collection,
           url: pageURL,
-          actions: []
+          actions: [],
         };
         collectionDataMetadataArray.push([collection, pageMetadata]);
       } catch (e) {
-        // TODO: fails silently
-        console.error("vs89hosidv", (e as Error).message);
+        LogMessage((e as Error).message, {
+          file: "writer.ts",
+          hint: "processTicket processComps massiveCatch"
+        });
         return false;
       }
     } else if (isCMSSingleType(collection)) {
@@ -399,7 +445,13 @@ class VectorDBWriter {
         );
 
         if (!url) {
-          // TODO: fails silently
+          LogMessage("no URL generated", {
+            file: "writer.ts",
+            hint: "processTicket buildCMSFetchURL featured-event",
+            collection,
+            cmsURL: env_vars.CMS_URL,
+            cmsPageFetchParams: cmsPageFetchParams,
+          });
           console.error("udasidaid", url);
           return false;
         }
@@ -420,7 +472,7 @@ class VectorDBWriter {
           const partialSiteEvent = convertSiteEventToPartialSiteEvent(
             event,
             env_vars.CMS_URL,
-            env_vars.FRONTEND_URL
+            env_vars.FRONTEND_URL,
           );
           const featuredEventMetaData: VectorDBFeaturedEventMetadata = {
             collection: collection,
@@ -439,8 +491,13 @@ class VectorDBWriter {
         });
 
         if (!url) {
-          // TODO: fails silently
-          console.error("udasgnaidaid", url);
+          LogMessage("no URL generated", {
+            file: "writer.ts",
+            hint: "processTicket buildCMSFetchURL leadership",
+            collection,
+            cmsURL: env_vars.CMS_URL,
+            cmsPageFetchParams: cmsPageFetchParams,
+          });
           return false;
         }
 
@@ -474,8 +531,13 @@ class VectorDBWriter {
         });
 
         if (!url) {
-          // TODO: fails silently
-          console.error("udasacsidaid", url);
+          LogMessage("no URL generated", {
+            file: "writer.ts",
+            hint: "processTicket buildCMSFetchURL site-info",
+            collection,
+            cmsURL: env_vars.CMS_URL,
+            cmsPageFetchParams: cmsPageFetchParams,
+          });
           return false;
         }
 
@@ -534,7 +596,7 @@ class VectorDBWriter {
           const partialSiteEvent = convertSiteEventToPartialSiteEvent(
             event,
             env_vars.CMS_URL,
-            env_vars.FRONTEND_URL
+            env_vars.FRONTEND_URL,
           );
           const eventMetaData: VectorDBFeaturedEventMetadata = {
             collection: collection,
@@ -627,7 +689,12 @@ class VectorDBWriter {
       vectorDBCollection = await this.client.getCollection({
         name: env_vars.CHROMA_DB_COLLECTION_NAME,
       });
-    } catch {
+    } catch (e) {
+      LogMessage((e as Error).message, {
+        file: "writer.ts",
+        hint: "processTicket updating stuff",
+        chroma_collection_name: env_vars.CHROMA_DB_COLLECTION_NAME,
+      });
       // creates collection if collection does not exist
       vectorDBCollection = await this.client.createCollection({
         name: env_vars.CHROMA_DB_COLLECTION_NAME,
@@ -662,6 +729,16 @@ class VectorDBWriter {
     // delete ticket
     await DBDeleteWithID("ticket", ticket.id!);
     console.log("fetch done", ticket.collection);
+  }
+
+  private isIdle() {
+    if (this.state != "idle") {
+      LogMessage(`Checked idle status while not idle`, {
+        file: "writer.ts",
+        state: this.state,
+      });
+    }
+    return this.state == "idle";
   }
 }
 
