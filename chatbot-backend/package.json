@@ -1,6 +1,7 @@
 {
   "scripts": {
     "dev": "nodemon --exec ts-node -r tsconfig-paths/register ./src/index.ts",
+    "test": "vitest",
     "contextTest": "nodemon --exec ts-node -r tsconfig-paths/register ./src/context/contextTest.ts",
     "queryTest": "nodemon --exec ts-node -r tsconfig-paths/register ./src/query/queryTest.ts",
     "build": "tsc",

@@ -1,29 +1,17 @@
-import "dotenv/config";
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { LogMessage } from "../log/log";
+import 'dotenv/config';
+import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
+import { env_vars } from '../tools/env/envVars';
 
-type GeminiModelName = "gemma-3-1b-it" | "gemma-3-27b-it";
-
-const RAW_KEYS: string =
-  process.env.GOOGLE_API_KEYS ?? process.env.GOOGLE_API_KEY ?? "";
-
-const API_KEYS: string[] = RAW_KEYS.split(",")
-  .map((key) => key.trim())
-  .filter((key): key is string => Boolean(key));
-
-if (API_KEYS.length === 0) {
-  const error = `'No API keys found. Set GOOGLE_API_KEYS=key1,key2,... (or GOOGLE_API_KEY).'`;
-  LogMessage(`${error}`, {
-    file: "langchain.ts",
-    hint: 'API_KEYS'
-  }).catch().finally(() => {
-    throw new Error(error);
-  });
-}
-
+const API_KEYS = env_vars.AI_APIKEYS;
 let keyIndex = 0;
 
+function normalizeKeyIndex() {
+  if (!Number.isFinite(keyIndex) || keyIndex < 0) keyIndex = 0;
+  if (API_KEYS.length > 0) keyIndex = keyIndex % API_KEYS.length;
+}
+
 function getCurrentKey(): string {
+  normalizeKeyIndex();
   return API_KEYS[keyIndex];
 }
 
@@ -45,28 +33,40 @@ function getErrorMessage(err: unknown): string {
 function shouldRotateKey(err: unknown): boolean {
   const msg = getErrorMessage(err).toLowerCase();
 
-  return (
-    msg.includes("quota") ||
-    msg.includes("resource has been exhausted") ||
-    msg.includes("rate limit") ||
-    msg.includes("too many requests") ||
-    msg.includes("429") ||
-    msg.includes("exceeded") ||
-    msg.includes("insufficient") ||
-    msg.includes("token")
-  );
+  const quotaLike =
+    msg.includes('429') ||
+    msg.includes('too many requests') ||
+    msg.includes('rate limit') ||
+    msg.includes('rate_limit') ||
+    msg.includes('quota') ||
+    msg.includes('resource has been exhausted') ||
+    msg.includes('resource exhausted') ||
+    msg.includes('exceeded quota') ||
+    msg.includes('quota exceeded');
+
+  const transient =
+    msg.includes('timeout') ||
+    msg.includes('timed out') ||
+    msg.includes('fetch failed') ||
+    msg.includes('econnreset') ||
+    msg.includes('etimedout') ||
+    msg.includes('enotfound') ||
+    msg.includes('503') ||
+    msg.includes('502') ||
+    msg.includes('500') ||
+    msg.includes('temporarily unavailable');
+
+  return quotaLike || transient;
 }
 
-export async function handleQuestion(
-  question: string,
-  modelName: GeminiModelName = "gemma-3-27b-it",
-): Promise<string> {
+export async function handleQuestion(question: string): Promise<string> {
   let lastErr: unknown = null;
 
   console.log("working on it");
   for (let attempt = 0; attempt < API_KEYS.length; attempt++) {
     const apiKey = getCurrentKey();
     try {
+      const modelName = env_vars.AI_MODEL;
       const model = new ChatGoogleGenerativeAI({
         model: modelName,
         apiKey,
@@ -88,7 +88,7 @@ export async function handleQuestion(
       advanceKey();
     }
   }
-  throw lastErr instanceof Error
-    ? lastErr
-    : new Error(`All API keys failed. Last error: ${getErrorMessage(lastErr)}`);
+  throw new Error(
+    `All API keys failed. Last error: ${getErrorMessage(lastErr)}`,
+  );
 }
