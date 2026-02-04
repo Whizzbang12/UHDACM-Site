@@ -60,5 +60,5 @@ for (const [key, val] of Object.entries(env_vars)) {
 if (isNaN(env_vars.PORT)) {
   throw new Error(`env_vars PORT is NaN`);
 } else if (isNaN(env_vars.CHROMA_DB_PORT)) {
-  throw new Error(`env_vars PORT is NaN`);
+  throw new Error(`env_vars CHROMA_DB_PORT is NaN`);
 }

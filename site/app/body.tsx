@@ -28,7 +28,7 @@ export default function Body({
       style={{ overflowY: overflowY, overflowX: "hidden" }}
     >
       <ScrollToSectionListener>
-        <button style={{position: 'fixed', zIndex: 1000, bottom: 10, left: 10}} onClick={handlePurchase}>Complete purchase</button>
+        {/* <button style={{position: 'fixed', zIndex: 1000, bottom: 10, left: 10}} onClick={handlePurchase}>Complete purchase</button> */}
         <Chatbot />
         <PopupCarousel />
         {children}

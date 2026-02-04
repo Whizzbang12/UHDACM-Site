@@ -188,7 +188,7 @@ export default function Chat(){
                 {/* header */}
                 <div className={styles.chatHeader}>
                     <div className={styles.headerContent}>
-                        <img src="/public/ACM Orange 6 compressed square.jpg" className={styles.ACMlogo}/>
+                        <img src="/Logo.png" className={styles.ACMlogo}/>
                         <div className={styles.headerText}>
                             <h3>ACM assistant</h3>
                             <p>Here to help you!</p>
