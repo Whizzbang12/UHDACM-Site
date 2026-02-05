@@ -7,7 +7,7 @@
     "start": "node ./dist/chatbot-backend/src",
 
     "setup-shared": "cd ../shared && npm i",
-    "build": "rm -rf ./dist && npm run setup-shared && tsc -b && tsc-alias",
+    "build": "rm -rf ./dist && npm i && npm run setup-shared && tsc -b && tsc-alias",
 
     "test": "vitest",
 
