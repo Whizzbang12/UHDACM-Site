@@ -6,6 +6,7 @@ dotenv.config();
 const pe = process.env;
 
 export const env_vars = {
+  FRONTEND_ADDRESS: pe.FRONTEND_ADDRESS!,
   PORT: Number(pe.PORT!),
 
   CHROMA_IS_CLOUD: pe.CHROMA_IS_CLOUD == "true",

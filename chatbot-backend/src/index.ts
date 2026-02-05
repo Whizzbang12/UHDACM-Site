@@ -4,17 +4,24 @@ import { processQuery } from "./query/query";
 import { LogMessage } from "./log/log";
 import { QueryMessage } from "@shared/types/query/queryTypes";
 import { checkQueryMessage } from "@shared/types/query/queryCheck";
+import { env_vars } from "./tools/env/envVars";
 
 const app = express();
-const PORT = 4000;
-const FRONTEND_ADDRESS = "http://localhost:3000";
+const PORT = env_vars.PORT;
+const FRONTEND_ADDRESS = env_vars.FRONTEND_ADDRESS;
 
 type ChatRequestBody = {
   query: string;
-  context: QueryMessage[]
+  context: QueryMessage[];
 };
 
 app.use(express.json());
+
+// health check endpoint
+app.get("/health_check", (_, res) => {
+  res.send({ online: true });
+});
+
 const allowedOrigins = [FRONTEND_ADDRESS];
 app.use(cors({ origin: allowedOrigins }));
 
@@ -42,9 +49,9 @@ app.post(
           validContext.push(msg);
         } catch (e) {
           LogMessage((e as Error).message, {
-            file: 'index.ts',
-            path: '/chat',
-            msg: msg
+            file: "index.ts",
+            path: "/chat",
+            msg: msg,
           });
         }
       }
@@ -56,8 +63,8 @@ app.post(
       return res.status(200).json({ response: response });
     } catch (e) {
       LogMessage((e as Error).message, {
-        'file': 'index.ts',
-        'endpoint': '/chat'
+        file: "index.ts",
+        endpoint: "/chat",
       });
       return res.status(400).json({ error: "server error" });
     }
