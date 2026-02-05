@@ -29,9 +29,19 @@ TESTING=false                           # (set to true if you want to run tests)
 
 PORT=5500                               # Port for the context manager server
 
+
+##### CHROMA #####
+CHROMA_IS_CLOUD=false                   # true if using cloud client, but that would require different env 
+# local
 CHROMA_DB_HOST=localhost                # Host for ChromaDB (local or cloud)
 CHROMA_DB_PORT=5477                     # Port for ChromaDB (default for local server)
 CHROMA_DB_COLLECTION_NAME=primary       # Name of the ChromaDB collection to use
+
+# cloud (only if chroma cloud is set to true)
+CHROMA_API_KEY=<get-ur-own-api-key>
+CHROMA_TENANT=<get-ur-own-tenant>
+CHROMA_DATABASE_NAME=<get-ur-own-db>
+
 
 FB_ADMIN_JSON=<get firebase service account>   # Path or JSON for Firebase service account
 

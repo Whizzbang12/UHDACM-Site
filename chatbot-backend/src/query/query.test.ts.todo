@@ -1,0 +1,5 @@
+
+const troublesumQueries = [
+  'What options are there to join the club?',
+  'Do you have salad?'
+];

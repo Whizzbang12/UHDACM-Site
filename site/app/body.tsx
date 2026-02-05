@@ -14,7 +14,7 @@ export default function Body({
   children: React.ReactNode;
   className?: string;
 }) {
-  const { overflowY } = useSelector((store: RootState) => store.body);
+  const { overflowY, chatbotDisableScrollOnMobile } = useSelector((store: RootState) => store.body);
 
   const posthog = usePostHog();
 
@@ -24,11 +24,11 @@ export default function Body({
 
   return (
     <body
-      className={`${className}`}
-      style={{ overflowY: overflowY, overflowX: "hidden" }}
+      className={`${className} ${chatbotDisableScrollOnMobile && 'chatbotDisableScrollOnMobile'}`}
+      style={{ ...(overflowY != 'auto' ?{overflowY: overflowY}:undefined), overflowX: "hidden" }}
     >
       <ScrollToSectionListener>
-        <button style={{position: 'fixed', zIndex: 1000, bottom: 10, left: 10}} onClick={handlePurchase}>Complete purchase</button>
+        {/* <button style={{position: 'fixed', zIndex: 1000, bottom: 10, left: 10}} onClick={handlePurchase}>Complete purchase</button> */}
         <Chatbot />
         <PopupCarousel />
         {children}

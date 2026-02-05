@@ -1,4 +1,4 @@
-import { ChromaClient, Collection } from "chromadb";
+import { ChromaClient, CloudClient, Collection } from "chromadb";
 import { env_vars } from "../env/envVars";
 import {
   cmsCollectionsSingular,
@@ -69,10 +69,16 @@ const cmsCollections = [
 ]; // all the single type collections in the cms
 
 class VectorDBWriter {
-  private client = new ChromaClient({
-    host: env_vars.CHROMA_DB_HOST,
-    port: env_vars.CHROMA_DB_PORT,
-  });
+  private client = env_vars.CHROMA_IS_CLOUD
+    ? new CloudClient({
+        apiKey: env_vars.CHROMA_API_KEY,
+        tenant: env_vars.CHROMA_TENANT,
+        database: env_vars.CHROMA_DATABASE_NAME,
+      })
+    : new ChromaClient({
+        host: env_vars.CHROMA_DB_HOST,
+        port: env_vars.CHROMA_DB_PORT,
+      });
 
   private state: VectorDBWriterState = "initializing";
 
@@ -103,7 +109,7 @@ class VectorDBWriter {
       LogMessage((e as Error).message, {
         file: "writer.ts",
         hint: "healthCheck getCollection",
-        chroma_collection_name: env_vars.CHROMA_DB_COLLECTION_NAME
+        chroma_collection_name: env_vars.CHROMA_DB_COLLECTION_NAME,
       });
       vectorDBCollection = await this.client.createCollection({
         name: env_vars.CHROMA_DB_COLLECTION_NAME,
@@ -168,7 +174,7 @@ class VectorDBWriter {
           LogMessage("ticket error", {
             file: "writer.ts",
             hint: "processTicket checkDBTicket",
-            ticket
+            ticket,
           });
           console.error("ticket error", (e as Error).message);
           continue;
@@ -429,7 +435,7 @@ class VectorDBWriter {
       } catch (e) {
         LogMessage((e as Error).message, {
           file: "writer.ts",
-          hint: "processTicket processComps massiveCatch"
+          hint: "processTicket processComps massiveCatch",
         });
         return false;
       }

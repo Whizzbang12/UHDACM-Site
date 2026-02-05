@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
-    "build": "next build --webpack",
+    
+    "setup-shared": "cd ../shared && npm i",
+    "build": "npm run setup-shared && next build --webpack",
     "start": "next start",
     "lint": "next lint"
   },

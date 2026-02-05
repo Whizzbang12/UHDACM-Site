@@ -38,7 +38,7 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <link rel="manifest" href="favicon_io/site.webmanifest" />
+      <link rel="favicon_io/manifest" href="favicon_io/site.webmanifest" />
       <PublicEnvProvider env={public_env_vars}>
         <AuthWrapper>
           <PostHogProvider>

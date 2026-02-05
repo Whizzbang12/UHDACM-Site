@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
 import { env_vars } from '../tools/env/envVars';
+import { LogMessage } from '../log/log';
 
 const API_KEYS = env_vars.AI_APIKEYS;
 let keyIndex = 0;
@@ -42,7 +43,7 @@ function shouldRotateKey(err: unknown): boolean {
     msg.includes('resource has been exhausted') ||
     msg.includes('resource exhausted') ||
     msg.includes('exceeded quota') ||
-    msg.includes('quota exceeded');
+    msg.includes('quota exceeded') || msg.includes('expired');
 
   const transient =
     msg.includes('timeout') ||
@@ -78,6 +79,7 @@ export async function handleQuestion(question: string): Promise<string> {
         ? response.content
         : JSON.stringify(response.content);
     } catch (err: unknown) {
+      console.error(err);
       lastErr = err;
       if (!shouldRotateKey(err)) {
         await LogMessage((err as Error).message, {
