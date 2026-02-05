@@ -43,7 +43,7 @@ function shouldRotateKey(err: unknown): boolean {
     msg.includes('resource has been exhausted') ||
     msg.includes('resource exhausted') ||
     msg.includes('exceeded quota') ||
-    msg.includes('quota exceeded');
+    msg.includes('quota exceeded') || msg.includes('expired');
 
   const transient =
     msg.includes('timeout') ||
@@ -79,6 +79,7 @@ export async function handleQuestion(question: string): Promise<string> {
         ? response.content
         : JSON.stringify(response.content);
     } catch (err: unknown) {
+      console.error(err);
       lastErr = err;
       if (!shouldRotateKey(err)) {
         await LogMessage((err as Error).message, {

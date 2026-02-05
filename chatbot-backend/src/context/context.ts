@@ -7,7 +7,7 @@ import { LogMessage } from "../log/log";
 
 // Define the collection name
 const collectionName = env_vars.CHROMA_DB_COLLECTION_NAME;
-const nResults = 5; // Define the number of results globally
+const nResults = 25; // Define the number of results globally
 
 // Initialize Chroma client
 const client = new ChromaClient({

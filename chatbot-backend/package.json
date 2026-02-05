@@ -1,20 +1,24 @@
 {
   "scripts": {
     "dev": "nodemon --exec ts-node -r tsconfig-paths/register ./src/index.ts",
-    "test": "vitest",
     "contextTest": "nodemon --exec ts-node -r tsconfig-paths/register ./src/context/contextTest.ts",
     "queryTest": "nodemon --exec ts-node -r tsconfig-paths/register ./src/query/queryTest.ts",
-    "build": "tsc",
-    "start": "node ./dist",
+
+    "start": "node ./dist/chatbot-backend/src",
+    "build": "rm -rf ./dist && npm i && tsc -b && tsc-alias",
+
+    "test": "vitest",
+
     "chroma-server": "chroma run",
-    "ingestTest": "nodemon --exec ts-node -r tsconfig-paths/register ./src/context/ingester.ts",
-    "test": "vitest log.test.ts"
+
+    "ingestTest": "nodemon --exec ts-node -r tsconfig-paths/register ./src/context/ingester.ts"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.16",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3"
   },

@@ -2,6 +2,8 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import { processQuery } from "./query/query";
 import { LogMessage } from "./log/log";
+import { QueryMessage } from "@shared/types/query/queryTypes";
+import { checkQueryMessage } from "@shared/types/query/queryCheck";
 
 const app = express();
 const PORT = 4000;
@@ -9,6 +11,7 @@ const FRONTEND_ADDRESS = "http://localhost:3000";
 
 type ChatRequestBody = {
   query: string;
+  context: QueryMessage[]
 };
 
 app.use(express.json());
@@ -29,9 +32,26 @@ app.post(
   "/chat",
   async (req: Request<{}, {}, ChatRequestBody>, res: Response) => {
     try {
-      const { query } = req.body;
+      const { query, context } = req.body;
 
-      const response = await processQuery(query);
+      // console.log('cias', context);
+      const validContext: QueryMessage[] = [];
+      for (const msg of context) {
+        try {
+          checkQueryMessage(msg);
+          validContext.push(msg);
+        } catch (e) {
+          LogMessage((e as Error).message, {
+            file: 'index.ts',
+            path: '/chat',
+            msg: msg
+          });
+        }
+      }
+
+      // console.log('context', validContext);
+
+      const response = await processQuery(query, validContext);
 
       return res.status(200).json({ response: response });
     } catch (e) {

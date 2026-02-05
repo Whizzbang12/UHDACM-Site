@@ -1,3 +1,5 @@
+'use server'
+
 import PersonTile from "@/app/_components/PersonTile/PersonTile";
 import { fetchCMS } from "@/app/_utils/cms";
 import { Person, SocialObj } from "@shared/types/cms/CMSTypes";

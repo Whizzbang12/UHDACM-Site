@@ -114,13 +114,13 @@ a {
   .SectionInner {
     padding: 0rem 1rem;
   }
-  .chatbotDisableScrollOnMobile {
-    overflow-y: hidden;
-  }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 576px) {
   :root {
     --page-max-width: 36rem;
+  }
+  .chatbotDisableScrollOnMobile {
+    overflow-y: hidden;
   }
 }

@@ -5,40 +5,72 @@ import { HiOutlineSparkles } from "react-icons/hi";
 import { MdOutlineClose } from "react-icons/md";
 import { LuSend, LuSquareArrowOutUpRight } from "react-icons/lu";
 import { useDispatch } from "react-redux";
-import { setChatbotDisableScrollOnMobile, setOverflowY } from "../body/bodySlice";
+import { setChatbotDisableScrollOnMobile } from "../body/bodySlice";
 import { usePublicEnv } from "@/app/_context/PublicEnvContext/PublicEnvContext";
 
-import { checkQueryResponse } from '@shared/types/query/queryCheck';
+import { checkQueryResponse } from "@shared/types/query/queryCheck";
+import { QueryResponse } from "@shared/types/query/queryTypes";
+import { contextMsgLimit } from "@shared/types/query/queryData";
+
+import Link from "next/link";
+import { usePostHog } from "posthog-js/react";
 
 // temporary, seeing how to format msgs (CSS) + scrolling to bottom
-interface Message {
+interface QueryMessage extends QueryResponse {
   sender: "user" | "bot";
-  message: string;
   timestamp: Date;
-  relevant_actions?: {
-    label: string;
-    href: string;
-  }[];
 }
 
 const logoPNG = "/Logo.png";
 
 export default function Chat() {
+  const posthog = usePostHog();
+
   const dispatch = useDispatch();
   const public_env = usePublicEnv();
   const [isOpenWebChat, setOpenWebChat] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
 
-  const [messages, setMessages] = useState<Message[]>([
+  const getLinkPath = (url: string): string => {
+    try {
+      const link = new URL(url);
+      const currentOrigin = window.location.origin;
+
+      if (link.origin === currentOrigin) {
+        return link.pathname + link.search + link.hash;
+      }
+      return url;
+    } catch (error) {
+      console.error("Invalid URL:", error);
+      return url;
+    }
+  };
+
+  const [messages, setMessages] = useState<QueryMessage[]>([
     {
       sender: "bot",
-      message: "Hey, welcome to UHD ACM! What are you looking for today?",
+      response: "Hey, welcome to UHD ACM! What are you looking for today?",
       timestamp: new Date(),
       // just to show "relavent actions" & style since im retrieving nothing
       relevant_actions: [
+        // {
+        //   label: "click me",
+        //   // href: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        //   href: "http://localhost:3000/events",
+        // },
+      ],
+      quick_replies: [
         {
-          label: "click me",
-          href: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          label: "View events",
+          value: "What events are coming up?",
+        },
+        {
+          label: "How to join",
+          value: "How do I join ACM?",
+        },
+        {
+          label: "Projects",
+          value: "What projects does ACM work on?",
         },
       ],
     },
@@ -65,23 +97,41 @@ export default function Chat() {
       ...prev,
       {
         sender: "user",
-        message: message,
+        response: message,
         timestamp: new Date(),
+        quick_replies: [],
+        relevant_actions: [],
       },
     ]);
 
     setIsLoading(true);
     setInputValue("");
 
+    let resMsg = 'error';
+    let resActions: QueryMessage['relevant_actions'] = [];
+    let resQuickReps: QueryMessage['quick_replies'] = [];
     try {
+      // adds some of the most recent messages as context.
+      const context: QueryMessage[] = [];
+      let count = 0;
+      for (let i = messages.length - 1; i >= 0; i--) {
+        if (i == 0) break; // excludes very first message (template message)
+        count += 1;
+        context.unshift(messages[i]);
+        if (count >= contextMsgLimit) {
+          break;
+        }
+      }
+
       const response = await fetch(public_env.NEXT_PUBLIC_CHATBOT_ENDPOINT, {
         method: "POST",
         headers: {
           whatever: "whatever",
-          'Content-Type': "application/json"
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           query: message,
+          context: context,
         }),
       });
 
@@ -93,19 +143,24 @@ export default function Chat() {
         ...prev,
         {
           sender: "bot",
-          message: query_response.response,
+          response: query_response.response,
           timestamp: new Date(),
           relevant_actions: query_response.relevant_actions,
+          quick_replies: query_response.quick_replies,
         },
       ]);
+      resMsg = query_response.response;
+      resActions.push(...query_response.relevant_actions);
+      resQuickReps.push(...query_response.quick_replies);
     } catch (error) {
-      console.error(error);
       setMessages((prev) => [
         ...prev,
         {
           sender: "bot",
-          message: "ERROORRRR!!!!",
+          response: "Something went wrong, try again later!",
           timestamp: new Date(),
+          quick_replies: [],
+          relevant_actions: [],
         },
       ]);
 
@@ -113,12 +168,21 @@ export default function Chat() {
       // setTimeout(() => {
       //     setMessages(prev => [...prev, {
       //         sender: 'bot',
-      //         message: "ERRRORRR!!",
+      //         response: "ERRRORRR!!",
       //         timestamp: new Date(),
       //     }]);
       //     setIsLoading(false);
       // }, 2000)
     } finally {
+      posthog.capture('sent_message', {
+        msg: message,
+        prev_msg: messages[messages.length - 1].response,
+        res: {
+          resMsg,
+          resActions,
+          resQuickReps
+        }
+      });
       setIsLoading(false);
     }
   };
@@ -140,10 +204,12 @@ export default function Chat() {
   const isButtonDisabled = inputValue.trim() === "" || isLoading;
 
   const handleOpening = () => {
+    posthog.capture('opened_chatbot');
     setIsClosing(false);
     setOpenWebChat(true);
   };
   const handleClosing = () => {
+    posthog.capture('closed_chatbot');
     setIsClosing(true);
     setTimeout(() => {
       setOpenWebChat(false);
@@ -190,12 +256,28 @@ export default function Chat() {
     };
   }, [isOpenWebChat]);
 
+  const screenWidthRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const handleResize = () => {
+      screenWidthRef.current = window.innerWidth;
+    };
+
+    handleResize(); // Set the initial value after the component mounts
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   return (
     <>
       {/*open chat button */}
       {!isOpenWebChat && (
         <button onClick={handleOpening} className={styles.toggleButton}>
-          <HiOutlineSparkles size={30} />
+          <HiOutlineSparkles size={30} strokeWidth={1} />
         </button>
       )}
 
@@ -230,9 +312,9 @@ export default function Chat() {
                 </p>
               </div>
 
-              {messages.map((msg, index) => (
+              {messages.map((msg, msgIndex) => (
                 <div
-                  key={index}
+                  key={msgIndex}
                   className={`${styles.messageWrapper} ${msg.sender === "bot" ? styles.botWrapper : styles.userWrapper}`}
                 >
                   {msg.sender === "bot" && (
@@ -245,20 +327,39 @@ export default function Chat() {
                     <div
                       className={`${styles.messageBubble} ${msg.sender === "bot" ? styles.messagesBot : styles.messagesUser}`}
                     >
-                      <p>{msg.message}</p>
+                      <p>{msg.response}</p>
                     </div>
 
                     {msg.relevant_actions && (
                       <div className={styles.relevantActions}>
-                        {msg.relevant_actions.map((action, index) => (
-                          <a
+                        {msg.relevant_actions.map((action, actionIndex) => (
+                          <Link
+                            onClick={() => {
+                              // tells posthog
+                              posthog.capture('clicked_action', {
+                                action: action,
+                                action_msg: messages[msgIndex].response,
+                              })
+
+                              // closes if full screened and button press
+                              if (
+                                getLinkPath(action.href).charAt(0) == "/" &&
+                                (screenWidthRef.current || 0) <= 576
+                              ) {
+                                handleClosing();
+                              }
+                            }}
                             className={styles.actionsBubble}
-                            key={index}
-                            href={action.href}
-                            target="_blank"
+                            key={actionIndex}
+                            href={getLinkPath(action.href)}
+                            target={
+                              getLinkPath(action.href).charAt(0) == "/"
+                                ? "_self"
+                                : "_blank"
+                            }
                           >
                             <LuSquareArrowOutUpRight size={16} /> {action.label}
-                          </a>
+                          </Link>
                         ))}
                       </div>
                     )}
@@ -312,30 +413,70 @@ export default function Chat() {
           {/* quick replies */}
           <div className={styles.quickReplies}>
             <p className={styles.quickRepliesLabel}>Quick Replies</p>
+            {messages.length != 1 && messages[0]?.quick_replies.length == 0 && (
+              <p
+                style={{ opacity: 0.5, marginLeft: "0.5rem" }}
+                className={styles.quickRepliesLabel}
+              >
+                None
+              </p>
+            )}
             <div className={styles.quickRepliesButtonContainer}>
-              <button
-                className={styles.quickRepliesButtons}
-                onClick={() => handleQuickreply("What events are coming up?")}
-              >
-                <HiOutlineSparkles size={12} />
-                View events
-              </button>
-              <button
-                className={styles.quickRepliesButtons}
-                onClick={() => handleQuickreply("How do I join ACM?")}
-              >
-                <HiOutlineSparkles size={12} />
-                How to join
-              </button>
-              <button
-                className={styles.quickRepliesButtons}
-                onClick={() =>
-                  handleQuickreply("What projects does ACM work on?")
-                }
-              >
-                <HiOutlineSparkles size={12} />
-                Projects
-              </button>
+              {
+                messages.length > 0 ? (
+                  <>
+                    {messages[messages.length - 1].quick_replies.map(
+                      (quick_reply, i) => {
+                        return (
+                          <button
+                            className={styles.quickRepliesButtons}
+                            onClick={() => {
+                              posthog.capture('clicked_quick_reply', {
+                                prev_msg: messages[messages.length - 1].response,
+                                quick_reply: quick_reply
+                              });
+                              handleQuickreply(quick_reply.value);
+                            }}
+                            key={i}
+                          >
+                            <HiOutlineSparkles size={12} />
+                            {quick_reply.label}
+                          </button>
+                        );
+                      },
+                    )}
+                  </>
+                ) : null
+                // (
+                //   <>
+                //     <button
+                //       className={styles.quickRepliesButtons}
+                //       onClick={() =>
+                //         handleQuickreply("What events are coming up?")
+                //       }
+                //     >
+                //       <HiOutlineSparkles size={12} />
+                //       View events
+                //     </button>
+                //     <button
+                //       className={styles.quickRepliesButtons}
+                //       onClick={() => handleQuickreply("How do I join ACM?")}
+                //     >
+                //       <HiOutlineSparkles size={12} />
+                //       How to join
+                //     </button>
+                //     <button
+                //       className={styles.quickRepliesButtons}
+                //       onClick={() =>
+                //         handleQuickreply("What projects does ACM work on?")
+                //       }
+                //     >
+                //       <HiOutlineSparkles size={12} />
+                //       Projects
+                //     </button>
+                //   </>
+                // )
+              }
             </div>
           </div>
         </div>

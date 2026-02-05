@@ -18,6 +18,8 @@ Set the following environment variables in a `.env` file in the project root:
 
 ```env
 GOOGLE_API_KEYS=<key>,<key2>,...
+AI_MODEL=gemma-3-27b-it
+
 CHROMA_DB_HOST=localhost
 CHROMA_DB_PORT=5477
 CHROMA_DB_COLLECTION_NAME=primary

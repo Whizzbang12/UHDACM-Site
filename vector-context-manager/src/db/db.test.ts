@@ -96,14 +96,14 @@ beforeAll(async () => {
 describe("DBCreate", () => {
   it("Should create an object successfully and return an ID", async () => {
     const sample = DocumentSamples[0];
-    DocumentSampleID = await DBCreate(collection, sample);
+    DocumentSampleID = await DBCreate(collection, sample!);
     expect(DocumentSampleID).toBeDefined();
   });
 
   it("Should create additional objects successfully", async () => {
     for (let i = 1; i < DocumentSamples.length; i++) {
       const sample = DocumentSamples[i];
-      const id = await DBCreate(collection, sample);
+      const id = await DBCreate(collection, sample!);
       expect(id).toBeDefined();
     }
   });
@@ -112,10 +112,10 @@ describe("DBCreate", () => {
 describe("DBGet", () => {
   it("Should retrieve the created object using a query", async () => {
     const results = await DBGet(collection, [
-      ["thing", "==", DocumentSamples[0].thing],
+      ["thing", "==", DocumentSamples[0]!.thing],
     ]);
     expect(results.length).toBe(1);
-    expect(results[0]).toMatchObject(DocumentSamples[0]);
+    expect(results[0]).toMatchObject(DocumentSamples[0]!);
   });
 
   it("Should retrieve all created objects one by one", async () => {
@@ -130,13 +130,13 @@ describe("DBGet", () => {
     const results = await DBGet(
       collection,
       [
-        ["thing", "==", DocumentSamples[1].thing],
-        [DocumentTestKey, "==", DocumentSamples[1][DocumentTestKey]],
+        ["thing", "==", DocumentSamples[1]!.thing],
+        [DocumentTestKey, "==", DocumentSamples[1]![DocumentTestKey]],
       ],
       "and"
     );
     expect(results.length).toBe(1);
-    expect(results[0]).toMatchObject(DocumentSamples[1]);
+    expect(results[0]).toMatchObject(DocumentSamples[1]!);
   });
 
   it("Should retrieve objects using AND query combination with multiple fields", async () => {
@@ -152,19 +152,19 @@ describe("DBGet", () => {
     isDocTypeArr(results);
     results;
     expect(
-      results.find((doc: DocType) => doc.thing === DocumentSamples[1].thing)
-    ).toMatchObject(DocumentSamples[1]);
+      results.find((doc: DocType) => doc.thing === DocumentSamples[1]!.thing)
+    ).toMatchObject(DocumentSamples[1]!);
     expect(
-      results.find((doc: DocType) => doc.thing === DocumentSamples[4].thing)
-    ).toMatchObject(DocumentSamples[4]);
+      results.find((doc: DocType) => doc.thing === DocumentSamples[4]!.thing)
+    ).toMatchObject(DocumentSamples[4]!);
   });
 
   it("Should retrieve objects using OR query combination", async () => {
     const results = await DBGet(
       collection,
       [
-        ["thing", "==", DocumentSamples[0].thing],
-        ["thing", "==", DocumentSamples[2].thing],
+        ["thing", "==", DocumentSamples[0]!.thing],
+        ["thing", "==", DocumentSamples[2]!.thing],
       ],
       "or"
     );
@@ -208,7 +208,7 @@ describe("DBGet", () => {
 describe("DBGetWithID", () => {
   it("Should retrieve the created object using its ID", async () => {
     const result = await DBGetWithID(collection, DocumentSampleID);
-    expect(result).toMatchObject(DocumentSamples[0]);
+    expect(result).toMatchObject(DocumentSamples[0]!);
   });
 });
 
@@ -238,19 +238,19 @@ describe("DBSetWithID", () => {
     for (const docIndex in allDocs) {
       const doc = allDocs[Number(docIndex)];
       const overrideData: DocType = {
-        thing: `overridden-${doc.id}`,
+        thing: `overridden-${doc!.id}`,
         [DocumentTestKey]: false,
         category: "overridden-category",
         num: Number(docIndex),
       };
-      await DBSetWithID(collection, doc.id, overrideData);
+      await DBSetWithID(collection, doc!.id, overrideData);
 
-      const overriddenDoc = await DBGetWithID(collection, doc.id);
+      const overriddenDoc = await DBGetWithID(collection, doc!.id);
       expect(overriddenDoc).toMatchObject(overrideData);
 
       // Reflect the changes in the DocumentSamples array
       const index = DocumentSamples.findIndex(
-        (sample) => sample.thing === doc.thing
+        (sample) => sample.thing === doc!.thing
       );
       if (index !== -1) {
         DocumentSamples[index] = overrideData;
@@ -274,7 +274,7 @@ describe("DBSetWithID", () => {
     });
 
     // Reflect the changes in the DocumentSamples array
-    DocumentSamples[0] = { ...DocumentSamples[0], ...combineData };
+    DocumentSamples[0] = { ...DocumentSamples[0]!, ...combineData };
   });
 
   it("Should combine fields for all documents individually using their IDs", async () => {
@@ -293,7 +293,7 @@ describe("DBSetWithID", () => {
         (sample) => sample.thing === doc.thing
       );
       if (index !== -1) {
-        DocumentSamples[index] = { ...DocumentSamples[index], ...combineData };
+        DocumentSamples[index] = { ...DocumentSamples[index]!, ...combineData };
       }
     }
   });

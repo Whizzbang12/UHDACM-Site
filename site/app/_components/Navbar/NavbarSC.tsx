@@ -1,3 +1,4 @@
+'use server'
 // server component. Used to render logo and pass it in
 
 import { fetchCMS } from "@/app/_utils/cms";
