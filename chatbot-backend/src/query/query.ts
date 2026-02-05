@@ -99,7 +99,6 @@ function checkQueryResponse(obj: unknown): asserts obj is QueryResponse {
 export const processQuery = async (query: string, context?: QueryMessage[]) => {
   // TODO: rework
   const QueryResponse = await queryCollection(query);
-
   let contextStr = "";
 
   for (const [document, metadata] of QueryResponse) {

@@ -153,6 +153,11 @@ export default function Chat() {
       resActions.push(...query_response.relevant_actions);
       resQuickReps.push(...query_response.quick_replies);
     } catch (error) {
+      console.error('cb', error);
+      posthog.captureException('send_message_error', {
+        msg: message,
+        error: (error as Error).message,
+      });
       setMessages((prev) => [
         ...prev,
         {

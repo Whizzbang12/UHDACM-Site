@@ -20,10 +20,20 @@ Set the following environment variables in a `.env` file in the project root:
 GOOGLE_API_KEYS=<key>,<key2>,...
 AI_MODEL=gemma-3-27b-it
 
+##### CHROMA #####
+# local
+CHROMA_IS_CLOUD=false
 CHROMA_DB_HOST=localhost
 CHROMA_DB_PORT=5477
 CHROMA_DB_COLLECTION_NAME=primary
 PORT=4000
+
+# cloud (only if chroma cloud is set to true)
+CHROMA_API_KEY=<get-ur-own-api-key>
+CHROMA_TENANT=<get-ur-own-tenant>
+CHROMA_DATABASE_NAME=<get-ur-own-db>
+
+
 
 # if logging enabled, will use betterstack logger.
 ENABLE_LOGGER=false

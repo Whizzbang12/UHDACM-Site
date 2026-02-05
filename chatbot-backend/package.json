@@ -5,7 +5,9 @@
     "queryTest": "nodemon --exec ts-node -r tsconfig-paths/register ./src/query/queryTest.ts",
 
     "start": "node ./dist/chatbot-backend/src",
-    "build": "rm -rf ./dist && npm i && tsc -b && tsc-alias",
+
+    "setup-shared": "cd ../shared && npm i",
+    "build": "rm -rf ./dist && npm run setup-shared && tsc -b && tsc-alias",
 
     "test": "vitest",
 

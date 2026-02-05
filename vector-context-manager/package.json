@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "nodemon --exec ts-node -r tsconfig-paths/register ./src/index.ts",
     "start": "node ./dist/vector-context-manager/src",
-    "build": "rm -rf ./dist && npm i && tsc -b && tsc-alias",
+
+    "setup-shared": "cd ../shared && npm i",
+    "build": "rm -rf ./dist && npm run setup-shared && npm i && tsc -b && tsc-alias",
     "test": "vitest",
     "chroma-server": "chroma run --port 5477"
   },
