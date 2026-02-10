@@ -5,7 +5,7 @@ import {
   DefaultCalendar,
   DefaultSearch,
 } from "@/app/_icons/Icons";
-import { CMSButtonIcon } from "./cmsTypes";
+import { CMSButtonIcon } from "@shared/types/cms/CMSTypes";
 import { ReactNode } from "react";
 
 export function getDefaultIconForCMSButton(icon: CMSButtonIcon) {

@@ -6,9 +6,10 @@ import ShareButton from "@/app/_components/Button/CommonVariants/ShareButton";
 import AddToCalendarButton from "@/app/_components/Button/Variants/AddToCalendarButton";
 import FeaturedEvent from "@/app/_components/FeaturedEvent/FeaturedEvent";
 import { DefaultChevronRight } from "@/app/_icons/Icons";
-import { FeaturedEvent as FeaturedSiteEvent } from "@/app/_utils/types/cms/cmsTypes";
+import { FeaturedEvent as FeaturedSiteEvent } from "@shared/types/cms/CMSTypes";
 import { generateEventShareText, TryGetImageFormatUrl } from "@/app/_utils/types/cms/cmsTypeTools";
-import { isStrapiPicture, isValidSiteEvent } from "@/app/_utils/validation";
+import { isStrapiPicture, isValidSiteEvent } from "@shared/types/cms/CMSCheck";
+import { usePublicEnv } from '@/app/_context/PublicEnvContext/PublicEnvContext';
 
 export default function FeaturedEventComp({
   featuredEvent,
@@ -16,13 +17,14 @@ export default function FeaturedEventComp({
   featuredEvent: FeaturedSiteEvent;
 }) {
   const { event, previewImageHD } = featuredEvent;
+  const public_env = usePublicEnv();
 
   if (!event || !isValidSiteEvent(event)) {
     return undefined;
   }
 
   const imgUrl = isStrapiPicture(previewImageHD)
-    ? `${TryGetImageFormatUrl(previewImageHD, "medium")}`
+    ? `${TryGetImageFormatUrl(previewImageHD, "medium", public_env.NEXT_PUBLIC_CMS_URL)}`
     : undefined;
 
   const dateStart = new Date(event.dateStart);

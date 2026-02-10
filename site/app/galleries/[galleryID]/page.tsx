@@ -2,14 +2,14 @@ import Button from "@/app/_components/Button/Button";
 import MainHeroSection from "@/app/_sections/MainHeroSection/MainHeroSection";
 import GalleryGrid from "./_components/GalleryGrid";
 import { fetchCMS } from "@/app/_utils/cms";
-import { isStrapiPicture, isValidSiteEvent } from "@/app/_utils/validation";
-import { StrapiPicture } from "@/app/_utils/types";
+import { isStrapiPicture, isValidSiteEvent } from "@shared/types/cms/CMSCheck";
+import { StrapiPicture } from "@shared/types/cms/CMSTypes";
 import Page404 from "@/app/not-found";
 import { NavbarPadding } from "@/app/_pageRenderer/PageRenderer";
 import ShareButton from "@/app/_components/Button/CommonVariants/ShareButton";
 import HeroSingleImage from "@/app/_sections/SplitHeroSection/HeroSingleImage/HeroSingleImage";
 import { generateGalleryShareText } from "@/app/_utils/types/cms/cmsTypeTools";
-import { WrapInNavbarAndFooter } from "@/app/_utils/tsxTools";
+import { WrapInNavbarAndFooter } from "@/app/_utils/tsxServerTools";
 
 type EventPageParams = Promise<{
   galleryID: string;
@@ -52,6 +52,9 @@ export default async function EventPage({
   }
 
   const media = event.gallery.media || [];
+  if (!Array.isArray(media)) {
+    return <Galleries404 />;
+  }
 
   const validMedia: StrapiPicture[] = [];
   for (const pic of media) {

@@ -1,7 +1,7 @@
 import SectionsRenderer from "../_sections/SectionRenderer/SectionsRenderer";
 import { fetchCMSPage } from "../_utils/cms";
-import { cmsSingleTypePage, SiteSection } from "../_utils/types/cms/cmsTypes";
-import { isValidSiteSection } from "../_utils/types/cms/cmsTypeValidation";
+import { cmsSingleTypePage, SiteSection } from "@shared/types/cms/CMSTypes";
+import { isValidSiteSection } from "@shared/types/cms/CMSCheck";
 import Page404 from "../not-found";
 
 import styles from './PageRenderer.module.css';

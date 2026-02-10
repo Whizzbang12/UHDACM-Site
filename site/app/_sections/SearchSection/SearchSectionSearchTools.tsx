@@ -7,9 +7,10 @@ import EntrySearchTool from "@/app/_components/EntrySearchTool/EntrySearchTool";
 import { EntryTileProps } from "@/app/_components/EntryTile/EntryTile";
 import { DefaultChevronRight, DefaultOpenInNewTab } from "@/app/_icons/Icons";
 import { EventToEntry } from "@/app/_utils/tsxTools";
-import { QnA, SiteEvent } from "@/app/_utils/types";
+import { QnA, SiteEvent } from "@shared/types/cms/CMSTypes";
 import { SearchSectionSearchToolProps } from "./SearchSection";
 import { generateGalleryShareText, generateQnAShareText, TryGetImageFormatUrl } from "@/app/_utils/types/cms/cmsTypeTools";
+import { usePublicEnv } from "@/app/_context/PublicEnvContext/PublicEnvContext";
 
 interface GallerySearchToolProps extends SearchSectionSearchToolProps {
   galleryEvents: SiteEvent[];
@@ -87,6 +88,7 @@ export function QnASearchTool({
   listingMode,
   defaultSortingMode,
 }: QnASearchToolProps) {
+  const public_env = usePublicEnv();
   const getUploadDateString = (QnA: QnA) => {
     const date = new Date(QnA.uploadDate);
     return date.toLocaleDateString(undefined, {
@@ -104,7 +106,7 @@ export function QnASearchTool({
       description: QnA.descriptionShort,
       header: QnA.videoName,
       imageSrc: QnA.thumbnail
-        ? `${TryGetImageFormatUrl(QnA.thumbnail, "medium")}`
+        ? `${TryGetImageFormatUrl(QnA.thumbnail, "medium", public_env.NEXT_PUBLIC_CMS_URL)}`
         : undefined,
       imageAlt: QnA.thumbnail?.alternativeText,
       style: undefined,

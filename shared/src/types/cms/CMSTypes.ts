@@ -1,17 +1,14 @@
-// TODO: Migrate all cms types to this file
+// TODO: This is a freaking mess, we'll have to clean this up soon.
 
-import { EntrySortMode, ListingMode, Person, SiteEvent, SocialObj, StrapiPicture } from "../../types";
+export type fetchableCMSCollection =
+  | cmsCollectionPlural
+  | cmsSingleType
+  | cmsSingleTypePage;
+export type cmsCollectionSingulars =
+  | cmsCollectionSingular
+  | cmsSingleType
+  | cmsSingleTypePage | 'any';
 
-// =========================== featuredEvent ===========================
-export interface FeaturedEvent {
-  previewImageHD?: string;
-  event: SiteEvent;
-}
-// =========================== featuredEvent (end) ===========================
-
-export interface Leadership {
-  people: Person[];
-}
 
 // BE SURE TO KEEP SINGULAR IN SYNC WITH PLURAL (e.g.: singular[0] = event, and plural[0] = events)
 export const cmsCollectionsSingular = [
@@ -32,6 +29,7 @@ export const cmsCollectionsPlural = [
 export type cmsCollectionSingular = (typeof cmsCollectionsSingular)[number];
 export type cmsCollectionPlural = (typeof cmsCollectionsPlural)[number];
 
+
 export const cmsSingleTypes = ["featured-event", "leadership", "site-info"] as const;
 export type cmsSingleType = (typeof cmsSingleTypes)[number];
 
@@ -46,6 +44,18 @@ export const cmsSingleTypePages = [
   "page-qnas"
 ] as const;
 export type cmsSingleTypePage = (typeof cmsSingleTypePages)[number];
+
+
+// =========================== featuredEvent ===========================
+export interface FeaturedEvent {
+  previewImageHD?: string;
+  event: SiteEvent;
+}
+// =========================== featuredEvent (end) ===========================
+
+export interface Leadership {
+  people: Person[];
+}
 
 const sectionCMSNames = [
   "site-sections.leadership-section",
@@ -200,3 +210,105 @@ export interface SiteInfo {
   logo: StrapiPicture;
   socials?: SocialObj[];
 }
+
+
+
+import { BlocksContent } from '@strapi/blocks-react-renderer'
+import { ObjectUnknown } from "../general/generalTypes";
+
+
+export type SiteEvent = {
+  id: number;
+  urlSlug: string;
+  name: string;
+  previewImage: StrapiPicture | undefined;
+  dateStart: string;
+  dateEnd: string;
+  descriptionShort: string;
+  descriptionFull: BlocksContent;
+  location: string;
+  gallery?: ObjectUnknown; // TODO: define more specifically
+  organizations?: Organization[];
+};
+
+export type SocialSite =
+  | "linkedin"
+  | "x"
+  | "facebook"
+  | "instagram"
+  | "personal_site"
+  | "github"
+  | "youtube"
+  | "discord";
+
+export const SocialSites: SocialSite[] = [
+  "linkedin",
+  "x",
+  "facebook",
+  "instagram",
+  "personal_site",
+  "github",
+  "youtube",
+  "discord"
+];
+
+export type SocialObj = {
+  type: SocialSite;
+  url: string;
+}
+
+export type Person = {
+  name: string;
+  nameShort: string;
+  picture: StrapiPicture | undefined;
+  role: string;
+  roleShort: string;
+  description: string;
+  socials: SocialObj[];
+}
+
+export type StrapiPictureFormat = {
+  ext: string;
+  url: string;
+  width: number;
+  height: number;
+};
+
+export type StrapiPicture = {
+  id: number;
+  url: string;
+  alternativeText: string;
+  caption: string;
+  width: number;
+  height: number;
+  name: string;
+  formats: {
+    thumbnail?: StrapiPictureFormat;
+    small?: StrapiPictureFormat;
+    medium?: StrapiPictureFormat;
+    large?: StrapiPictureFormat;
+  };
+};
+
+export type Organization = {
+  name: string,
+  description: string,
+  logo: StrapiPicture | undefined,
+};
+
+
+export const ListingModes = ["on", "after", "before"] as const;
+export type ListingMode = typeof ListingModes[number];
+
+export const EntrySortModes = ["ascending", "descending"] as const;
+export type EntrySortMode = typeof EntrySortModes[number];
+
+export type QnA = {
+  videoName: string,
+  featuredGuests?: string,
+  thumbnail?: StrapiPicture,
+  videoLink: string,
+  uploadDate: string,
+  descriptionShort: string
+};
+

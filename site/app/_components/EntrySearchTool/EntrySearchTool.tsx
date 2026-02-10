@@ -3,7 +3,7 @@ import { SearchBar } from "@/app/_components/SearchBar/SearchBar";
 import Calendar from "@/app/_components/Calendar/Calendar";
 import { useEffect, useState } from "react";
 import { intToMonth, toTitleCase } from "@/app/_utils/tools";
-import { EntrySortMode, ListingMode } from "@/app/_utils/types";
+import { EntrySortMode, ListingMode } from "@shared/types/cms/CMSTypes";
 import { DefaultClose } from "@/app/_icons/Icons";
 import { useBodyOverflowY } from "@/app/_features/body/useSetBodyOverflowY";
 import { EntryTileProps } from "../EntryTile/EntryTile";

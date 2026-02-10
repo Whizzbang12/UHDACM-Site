@@ -1,7 +1,6 @@
 import { fetchCMS } from "@/app/_utils/cms";
-import { isStrapiPicture, isValidQnA } from "@/app/_utils/validation";
+import { isStrapiPicture, isValidQnA } from "@shared/types/cms/CMSCheck";
 import MainHeroSection from "../MainHeroSection/MainHeroSection";
-import CoolImage from "@/app/_components/CoolImage/CoolImage";
 import Button from "@/app/_components/Button/Button";
 import { DefaultChevronRight, DefaultSearch } from "@/app/_icons/Icons";
 import HeroSingleImage from "../SplitHeroSection/HeroSingleImage/HeroSingleImage";

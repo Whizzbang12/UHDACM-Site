@@ -16,9 +16,9 @@ import { NavbarPadding } from "@/app/_pageRenderer/PageRenderer";
 import CallToActionSection from "@/app/_sections/CallToActionSection/CallToActionSection";
 import MainHeroSection from "@/app/_sections/MainHeroSection/MainHeroSection";
 import HeroSingleImage from "@/app/_sections/SplitHeroSection/HeroSingleImage/HeroSingleImage";
-import { SiteEvent } from "@/app/_utils/types";
+import { SiteEvent } from "@shared/types/cms/CMSTypes";
 import { generateEventShareText } from "@/app/_utils/types/cms/cmsTypeTools";
-import { isStrapiPicture } from "@/app/_utils/validation";
+import { isStrapiPicture } from "@shared/types/cms/CMSCheck";
 import { getDefaultIconForCMSButton } from "@/app/_utils/types/cms/cmsTypeToolsTsx";
 
 function ShareEventButton({ event }: { event: SiteEvent }) {

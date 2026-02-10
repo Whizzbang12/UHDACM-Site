@@ -1,5 +1,5 @@
 import { fetchCMS } from "@/app/_utils/cms";
-import { isValidFeaturedEvent } from "@/app/_utils/types/cms/cmsTypeValidation";
+import { isValidFeaturedEvent } from "@shared/types/cms/CMSCheck";
 import FeaturedEventComp from "./FeaturedEventComp";
 import styles from './FeaturedEventSection.module.css';
 

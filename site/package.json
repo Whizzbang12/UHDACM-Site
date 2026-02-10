@@ -3,18 +3,22 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
+    "dev": "next dev --webpack",
+    
+    "setup-shared": "cd ../shared && npm i",
+    "build": "npm run setup-shared && next build --webpack",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.37.1",
     "@reduxjs/toolkit": "^2.8.2",
     "@strapi/blocks-react-renderer": "^1.0.2",
     "@vercel/analytics": "^1.5.0",
-    "next": "15.4.8",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "next": "^16.1.3",
+    "posthog-js": "^1.338.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
     "react-icons": "^5.5.0",
     "react-redux": "^9.2.0"
   },

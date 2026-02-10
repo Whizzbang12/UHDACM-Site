@@ -1,6 +1,9 @@
-import { CMSButton as CMSButtonProps } from "@/app/_utils/types/cms/cmsTypes";
+'use client'
+
+import { CMSButton as CMSButtonProps } from "@shared/types/cms/CMSTypes";
 import Button from "../Button";
 import { getDefaultIconForCMSButton } from "@/app/_utils/types/cms/cmsTypeToolsTsx";
+import posthog from "posthog-js";
 
 export default function CMSButton({
   text,
@@ -10,6 +13,14 @@ export default function CMSButton({
   target,
 }: CMSButtonProps) {
   const IconComp = icon ? getDefaultIconForCMSButton(icon) : undefined;
+
+  const bre = () => {
+    posthog.capture("Hello World", {
+      programmed: "to work",
+      and_not: "to feel",
+    });
+  };
+
   return (
     <Button
       style={{
@@ -21,6 +32,7 @@ export default function CMSButton({
       }}
       href={href}
       target={target}
+      onClick={bre}
     >
       {!isIconOnRightSide && IconComp && IconComp}
       <span className={"BodyLargeHeavy"}>{text}</span>

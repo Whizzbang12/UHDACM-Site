@@ -1,4 +1,4 @@
-import { Month, Months } from "./types";
+import { Month, Months } from "@shared/types/general/generalTypes";
 /**
  * Converts a 0-based integer (0 = January) to a Month string.
  */
@@ -24,7 +24,7 @@ export function objectToUrlParams(obj: Record<string, any>): string {
 export function toTitleCase(str: string): string {
   return str.replace(
     /\w\S*/g,
-    (txt) => txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase()
+    (txt) => txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase(),
   );
 }
 
@@ -52,16 +52,16 @@ export function buildICS({
     LOCATION:${location}
     END:VEVENT
     END:VCALENDAR`
-    .split('\n')
-    .map((line) => line.replace(/(.{75})(?=.)/g, '$1\r\n '))
-    .join('\r\n');;
+    .split("\n")
+    .map((line) => line.replace(/(.{75})(?=.)/g, "$1\r\n "))
+    .join("\r\n");
 }
 
-export function downloadICS(icsContent: string, filename = 'event.ics') {
-  const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+export function downloadICS(icsContent: string, filename = "event.ics") {
+  const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
   const url = URL.createObjectURL(blob);
 
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = filename;
   document.body.appendChild(a); // ensure it's in DOM for Firefox
@@ -94,11 +94,11 @@ export function CalendarLinkGoogle({
   }
 
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
-    title
+    title,
   )}&dates=${formatDate(startDate)}/${formatDate(
-    endDate
+    endDate,
   )}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(
-    location
+    location,
   )}`;
 }
 
@@ -119,11 +119,11 @@ export function CalendarLinkOutlook({
   const startStr = formatDate(startDate);
   const endStr = formatDate(endDate);
   const outlookUrl = `https://outlook.live.com/calendar/0/deeplink/compose?subject=${encodeURIComponent(
-    title
+    title,
   )}&body=${encodeURIComponent(details)}&startdt=${encodeURIComponent(
-    startStr
+    startStr,
   )}&enddt=${encodeURIComponent(endStr)}&location=${encodeURIComponent(
-    location
+    location,
   )}`;
   return outlookUrl;
 }
@@ -134,12 +134,12 @@ export function CalendarLinkOutlook({
  * @param path
  * @returns
  */
-export function ProduceCMSResourceURL(path?: string) {
+export function ProduceCMSResourceURL(cmsUrl: string, path?: string) {
   if (!path) {
     return undefined;
   }
   if (path.at(0) == "/") {
-    return `${process.env.NEXT_PUBLIC_CMS_URL}${path}`;
+    return `${cmsUrl}${path}`;
   }
   return path;
 }

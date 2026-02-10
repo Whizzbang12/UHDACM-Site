@@ -1,5 +1,5 @@
 import PageRenderer from "../_pageRenderer/PageRenderer";
-import { WrapInNavbarAndFooter } from "../_utils/tsxTools";
+import { WrapInNavbarAndFooter } from "../_utils/tsxServerTools";
 
 export default async function Page() {
   return (

@@ -2,7 +2,7 @@ import {
   easingType,
   getEasingFunction,
 } from "@/app/_utils/easingFunctions";
-import { CardinalDirection } from "@/app/_utils/types";
+import { CardinalDirection } from "@shared/types/general/generalTypes";
 
 export default function WipeTransition({
   tV,

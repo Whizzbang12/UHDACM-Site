@@ -1,3 +1,5 @@
+'use client'
+
 import { Fragment } from "react";
 import Button from "../_components/Button/Button";
 import ShareButton from "../_components/Button/CommonVariants/ShareButton";
@@ -6,13 +8,15 @@ import { EntryTileProps } from "../_components/EntryTile/EntryTile";
 import Footer from "../_components/Footer/Footer";
 import NavbarSC from "../_components/Navbar/NavbarSC";
 import { DefaultChevronRight } from "../_icons/Icons";
-import { SiteEvent } from "./types";
+import { SiteEvent } from "@shared/types/cms/CMSTypes";
 import { generateEventShareText, ProduceDateRangeText, TryGetImageFormatUrl } from "./types/cms/cmsTypeTools";
-import { isStrapiPicture } from "./validation";
+import { isStrapiPicture } from "@shared/types/cms/CMSCheck";
+import { usePublicEnv } from "../_context/PublicEnvContext/PublicEnvContext";
 
 export function EventToEntry(event: SiteEvent): EntryTileProps {
+  const public_env = usePublicEnv();
   const imgUrl = isStrapiPicture(event.previewImage)
-    ? `${TryGetImageFormatUrl(event.previewImage, 'medium')}`
+    ? `${TryGetImageFormatUrl(event.previewImage, 'medium', public_env.NEXT_PUBLIC_CMS_URL)}`
     : undefined;
 
   const subheader = ProduceDateRangeText(event.dateStart, event.dateEnd);
@@ -60,14 +64,4 @@ export function EventToEntry(event: SiteEvent): EntryTileProps {
     subheader: subheader,
     subheaderTwo: event.location,
   };
-}
-
-export function WrapInNavbarAndFooter({ children }: { children: React.ReactNode }) {
-  return (
-    <Fragment key="PageWrapperNavbarFooter">
-      <NavbarSC key="Navbar" />
-      {children}
-      <Footer key="Footer" />
-    </Fragment>
-  );
 }

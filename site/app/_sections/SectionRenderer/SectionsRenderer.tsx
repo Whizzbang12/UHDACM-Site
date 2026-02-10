@@ -4,12 +4,12 @@ import {
   isValidSiteSectionLeadership,
   isValidSiteSectionSearch,
   isValidSiteSectionSplitHero,
-} from "@/app/_utils/types/cms/cmsTypeValidation";
+} from "@shared/types/cms/CMSCheck";
 import { ReactNode } from "react";
 import FeaturedEventSection from "../FeaturedEventSection/FeaturedEventSection";
 import LatestQnASection from "../LatestQnASection/LatestQnASection";
 import SearchSection from "../SearchSection/SearchSection";
-import { SiteSection } from "@/app/_utils/types/cms/cmsTypes";
+import { SiteSection } from "@shared/types/cms/CMSTypes";
 import SplitHeroSection from "../SplitHeroSection/SplitHeroSection";
 import LeadershipSection from "../LeadershipSection/LeadershipSection";
 
@@ -20,7 +20,7 @@ export default function SectionsRenderer({
 }) {
   return (
     <>
-      {sections.map((section, i) => {
+      {sections.map((section) => {
         let Comp: ReactNode = undefined;
         const id = section.id;
         if (isValidSiteSectionLeadership(section)) {

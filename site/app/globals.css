@@ -1,6 +1,7 @@
 /* Global Variables */
 :root {
   --page-max-width: 70rem;
+  font-family: 'Inter', sans-serif;
 }
 
 
@@ -95,6 +96,10 @@ a {
 	align-items: center;
 }
 
+.chatbotDisableScrollOnMobile {
+  overflow-y: initial;
+}
+
 
 @media (max-width: 1200px) {
   :root {
@@ -111,8 +116,11 @@ a {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 576px) {
   :root {
     --page-max-width: 36rem;
+  }
+  .chatbotDisableScrollOnMobile {
+    overflow-y: hidden;
   }
 }

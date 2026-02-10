@@ -1,8 +1,16 @@
 
-import { isCMSCollectionSingular, isCMSSingleType, isCMSSingleTypePage } from "@/app/_utils/types/cms/cmsTypeValidation";
+import { private_env_vars } from "@/app/_utils/private_env_vars";
+import { EqualsTimed } from "@shared/tools";
+import { isCMSCollectionSingular, isCMSSingleType, isCMSSingleTypePage } from "@shared/types/cms/CMSCheck";
 import { revalidateTag } from "next/cache";
 
 export async function POST(req: Request) {
+  const headers = req.headers;
+  const CMSAuthToken = headers.get('authorization');
+  if (!await EqualsTimed(CMSAuthToken, private_env_vars.CMS_AUTH_TOKEN, 1000)) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 403 });
+  }
+
   const body = await req.json();
 
   console.log('Received CMS update request:', body);
@@ -23,8 +31,8 @@ export async function POST(req: Request) {
 
   console.log(`Revalidating tag for model: ${model}`);
   // revalidates all paths that rely on the CMS collection
-  revalidateTag(model);
-  revalidateTag('any');
+  revalidateTag(model, 'max');
+  revalidateTag('any', 'max');
 
   return new Response(JSON.stringify({ okay: true }));
 }

@@ -1,4 +1,5 @@
-import { NavigationEntryObj, SocialObj } from "./types";
+import { NavigationEntryObj } from "./types";
+import { SocialObj } from "@shared/types/cms/CMSTypes";
 
 export const NavigationTree: NavigationEntryObj[] = [
   {

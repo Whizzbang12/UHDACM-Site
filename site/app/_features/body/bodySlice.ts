@@ -2,10 +2,12 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 type initialState = {
   overflowY: 'auto' | 'hidden' | 'scroll';
-}
+  chatbotDisableScrollOnMobile: boolean
+};
 
 const initialState: initialState = {
   overflowY: "auto",
+  chatbotDisableScrollOnMobile: false
 };
 
 const bodySlice = createSlice({
@@ -15,8 +17,11 @@ const bodySlice = createSlice({
     setOverflowY: (state, action: PayloadAction<initialState["overflowY"]>) => {
       state.overflowY = action.payload;
     },
+    setChatbotDisableScrollOnMobile: (state, action: PayloadAction<initialState['chatbotDisableScrollOnMobile']>) => {
+      state.chatbotDisableScrollOnMobile = action.payload;
+    }
   },
 });
 
-export const { setOverflowY } = bodySlice.actions;
+export const { setOverflowY, setChatbotDisableScrollOnMobile } = bodySlice.actions;
 export default bodySlice.reducer;

@@ -1,4 +1,4 @@
-import {  HeroTextBlock as HeroTextBlockProps, } from '@/app/_utils/types/cms/cmsTypes';
+import {  HeroTextBlock as HeroTextBlockProps, } from "@shared/types/cms/CMSTypes";
 import { Fragment, ReactNode } from 'react';
 import styles from './HeroTextBlock.module.css'
 import CMSButton from '@/app/_components/Button/CMSButton/CMSButton';

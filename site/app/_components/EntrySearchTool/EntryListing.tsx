@@ -8,8 +8,8 @@ import {
   EntrySortModes,
   ListingMode,
   ListingModes,
-  Month,
-} from "@/app/_utils/types";
+} from "@shared/types/cms/CMSTypes";
+import { Month } from "@shared/types/general/generalTypes";
 import { monthToInt, toTitleCase } from "@/app/_utils/tools";
 
 import styles from "./EntryListing.module.css";
@@ -41,10 +41,10 @@ export function EntryListing({
   onDatePress,
 }: EventListingProps) {
   const [listingMode, setListingMode] = useState<ListingMode>(
-    defaultListingMode || "after"
+    defaultListingMode || "after",
   );
   const [sortingMode, setSortingMode] = useState<EntrySortMode>(
-    defaultSortingMode || "ascending"
+    defaultSortingMode || "ascending",
   );
 
   const entryList = entries;
@@ -58,9 +58,11 @@ export function EntryListing({
 
     // const eventID = entries.id.toString();
     const eventDate = new Date(entry.date);
-    const selectedDate = new Date(Number(year), Number(monthToInt(month as Month)), Number(day));
-
-    
+    const selectedDate = new Date(
+      Number(year),
+      Number(monthToInt(month as Month)),
+      Number(day),
+    );
 
     // Zero out the time for both dates to compare only year, month, day
     eventDate.setHours(0, 0, 0, 0);
@@ -199,10 +201,7 @@ export function EntryListing({
                 return undefined;
               }
               return (
-                <div
-                  key={i}
-                  className={`${styles["CardContainer"]}`}
-                >
+                <div key={i} className={`${styles["CardContainer"]}`}>
                   <EntryTile {...entry} />
                 </div>
               );
