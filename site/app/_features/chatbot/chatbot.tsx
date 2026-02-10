@@ -69,8 +69,8 @@ export default function Chat() {
           value: "How do I join ACM?",
         },
         {
-          label: "Projects",
-          value: "What projects does ACM work on?",
+          label: "Cool Stuff!",
+          value: "Can you tell me what Galleries and QnAs are at UHD ACM?",
         },
       ],
     },
@@ -79,8 +79,8 @@ export default function Chat() {
   // CHATBOT PART!
   // scrolls down when new messages are sent
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
+    messagesEndRef.current?.scrollIntoView({ behavior: behavior });
   };
 
   useEffect(() => {
@@ -107,9 +107,9 @@ export default function Chat() {
     setIsLoading(true);
     setInputValue("");
 
-    let resMsg = 'error';
-    let resActions: QueryMessage['relevant_actions'] = [];
-    let resQuickReps: QueryMessage['quick_replies'] = [];
+    let resMsg = "error";
+    let resActions: QueryMessage["relevant_actions"] = [];
+    let resQuickReps: QueryMessage["quick_replies"] = [];
     try {
       // adds some of the most recent messages as context.
       const context: QueryMessage[] = [];
@@ -153,8 +153,8 @@ export default function Chat() {
       resActions.push(...query_response.relevant_actions);
       resQuickReps.push(...query_response.quick_replies);
     } catch (error) {
-      console.error('cb', error);
-      posthog.captureException('send_message_error', {
+      console.error("cb", error);
+      posthog.captureException("send_message_error", {
         msg: message,
         error: (error as Error).message,
       });
@@ -179,14 +179,14 @@ export default function Chat() {
       //     setIsLoading(false);
       // }, 2000)
     } finally {
-      posthog.capture('sent_message', {
+      posthog.capture("sent_message", {
         msg: message,
         prev_msg: messages[messages.length - 1].response,
         res: {
           resMsg,
           resActions,
-          resQuickReps
-        }
+          resQuickReps,
+        },
       });
       setIsLoading(false);
     }
@@ -209,12 +209,12 @@ export default function Chat() {
   const isButtonDisabled = inputValue.trim() === "" || isLoading;
 
   const handleOpening = () => {
-    posthog.capture('opened_chatbot');
+    posthog.capture("opened_chatbot");
     setIsClosing(false);
     setOpenWebChat(true);
   };
   const handleClosing = () => {
-    posthog.capture('closed_chatbot');
+    posthog.capture("closed_chatbot");
     setIsClosing(true);
     setTimeout(() => {
       setOpenWebChat(false);
@@ -248,7 +248,9 @@ export default function Chat() {
     setInputValue(text);
     inputRef.current?.focus();
   };
+
   // disable scrolling in chatbot when on mobile
+  // also auto scrolls to bottom
   useEffect(() => {
     if (isOpenWebChat) {
       dispatch(setChatbotDisableScrollOnMobile(true));
@@ -256,6 +258,7 @@ export default function Chat() {
       dispatch(setChatbotDisableScrollOnMobile(false));
     }
 
+    scrollToBottom("instant");
     return () => {
       dispatch(setChatbotDisableScrollOnMobile(true));
     };
@@ -277,6 +280,7 @@ export default function Chat() {
     };
   }, []);
 
+
   return (
     <>
       {/*open chat button */}
@@ -297,7 +301,7 @@ export default function Chat() {
               <img src={logoPNG} className={styles.ACMlogo} />
               <div className={styles.headerText}>
                 <h3 className="H5">ACM assistant</h3>
-                <p>Here to help you!</p>
+                <p style={{ fontSize: "1rem" }}>Here to help you!</p>
               </div>
             </div>
             <button className={styles.closeChatButton} onClick={handleClosing}>
@@ -341,10 +345,10 @@ export default function Chat() {
                           <Link
                             onClick={() => {
                               // tells posthog
-                              posthog.capture('clicked_action', {
+                              posthog.capture("clicked_action", {
                                 action: action,
                                 action_msg: messages[msgIndex].response,
-                              })
+                              });
 
                               // closes if full screened and button press
                               if (
@@ -363,7 +367,10 @@ export default function Chat() {
                                 : "_blank"
                             }
                           >
-                            <LuSquareArrowOutUpRight size={16} /> {action.label}
+                            {getLinkPath(action.href).charAt(0) != "/" && (
+                              <LuSquareArrowOutUpRight size={"1rem"} />
+                            )}{" "}
+                            {action.label}
                           </Link>
                         ))}
                       </div>
@@ -418,13 +425,20 @@ export default function Chat() {
           {/* quick replies */}
           <div className={styles.quickReplies}>
             <p className={styles.quickRepliesLabel}>Quick Replies</p>
-            {messages.length != 1 && messages[0]?.quick_replies.length == 0 && (
+            {!isLoading && messages.length != 1 && (messages[messages.length - 1].quick_replies.length == 0) && (
               <p
                 style={{ opacity: 0.5, marginLeft: "0.5rem" }}
                 className={styles.quickRepliesLabel}
               >
                 None
               </p>
+            )}
+            {isLoading && (
+              <div style={{marginLeft: '1em'}} className={styles.loadingDots}>
+                <div className={styles.dot} />
+                <div className={styles.dot} />
+                <div className={styles.dot} />
+              </div>
             )}
             <div className={styles.quickRepliesButtonContainer}>
               {
@@ -436,9 +450,10 @@ export default function Chat() {
                           <button
                             className={styles.quickRepliesButtons}
                             onClick={() => {
-                              posthog.capture('clicked_quick_reply', {
-                                prev_msg: messages[messages.length - 1].response,
-                                quick_reply: quick_reply
+                              posthog.capture("clicked_quick_reply", {
+                                prev_msg:
+                                  messages[messages.length - 1].response,
+                                quick_reply: quick_reply,
                               });
                               handleQuickreply(quick_reply.value);
                             }}

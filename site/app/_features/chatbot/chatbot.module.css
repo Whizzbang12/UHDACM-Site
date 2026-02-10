@@ -61,6 +61,7 @@
   z-index: 1000;
   overflow: hidden;
   color: rgba(var(--color-font-default), 1);
+  box-sizing: border-box;
 }
 .chatWindowOpen {
   animation: slideUpFade 0.3s ease;
@@ -99,8 +100,8 @@
 }
 
 .ACMlogo {
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 1.75em;
+  height: 1.75em;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -123,13 +124,13 @@
   color: rgba(var(--color-font-default), 1);
 }
 .greetingBlock p {
-  font-size: 13px;
+  font-size: 0.75em;
   color: #ffffff77;
 }
 
 .botIconContainer {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.5em;
+  height: 1.5em;
   border-radius: 50%;
   margin-top: 10px;
   padding-left: 2px;
@@ -175,14 +176,15 @@
 }
 
 .messageBubble {
-  padding: 0.6rem;
+  padding: 0.6em;
   width: fit-content;
   word-wrap: break-word;
-  border-radius: 1rem;
+  border-radius: 1em;
+  font-size: 1em;
 }
 
 .messageBubble p {
-  font-size: 0.8rem;
+  font-size: 0.9em;
 }
 
 /*
@@ -194,7 +196,7 @@
   border: 1px solid #6b788a9a;
   justify-content: flex-start;
   color: white;
-  border-start-start-radius: 0.2rem;
+  border-start-start-radius: 0.2em;
   text-align: left;
   width: fit-content;
   /* max-width: 60%; */
@@ -204,16 +206,16 @@
   text-align: left;
   background-color: rgba(var(--color-font-primary), 1);
   color: white;
-  border-start-end-radius: 0.2rem;
+  border-start-end-radius: 0.2em;
   width: fit-content;
   /* max-width: 60%; */
 }
 
 .messageTime {
   display: block;
-  font-size: 0.6rem;
+  font-size: 0.6em;
   opacity: 0.5;
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.2em;
 }
 
 .messagesBot .messageTime {
@@ -228,21 +230,22 @@
   margin-top: 8px;
   display: flex;
   width: 100%;
-  gap: 0.25rem;
+  gap: 0.25em;
   flex-direction: column;
 }
 
 .actionsBubble {
   background-color: rgba(var(--color-font-primary), 1);
   border: 2px solid rgba(var(--color-font-default), 0.25);
-  border-radius: 18px;
-  padding: 12px 14px;
+  border-radius: 1em;
+  padding: 0.75em 0.8em;
   width: 100%;
   box-sizing: border-box;
   justify-content: center;
+  align-items: center;
   text-align: center;
-  font-size: 16px;
-  gap: 8px;
+  font-size: 0.8em;
+  gap: 0.5em;
   display: flex;
   line-height: 1;
   transition: opacity 0.05s ease-in-out, transform 0.05s ease-in-out;
@@ -303,8 +306,8 @@
   align-items: center;
   background-color: #1f2937;
   border-radius: 24px;
-  padding: 0.1rem 1rem;
-  padding-right: 0.5rem;
+  padding: 0.1em 1em;
+  padding-right: 0.5em;
   border: 1px solid rgba(var(--color-font-default), 0.25);
   transition: border-color 0.2s ease;
   position: relative;
@@ -315,6 +318,7 @@
 }
 
 .chatInput {
+  font-size: 1em;
   flex: 1;
   outline: none;
   border: none;
@@ -334,10 +338,10 @@
   justify-content: center;
   box-sizing: border-box;
   border-radius: 50%;
-  padding: 0.5rem;
+  padding: 0.5em;
   border: none;
   position: absolute;
-  right: 0.5rem;
+  right: 0.5em;
   cursor: pointer;
 }
 .sendButton:disabled {
@@ -347,21 +351,21 @@
 
 /* quick replies */
 .quickReplies {
-  gap: 8px;
-  padding: 5px 14px;
+  gap: 0.75em;
+  padding: 0.25em 1em;
   flex-wrap: nowrap;
   overflow-x: auto;
 }
 
 .quickRepliesLabel {
-  font-size: 12px;
+  font-size: 0.75em;
   text-align: left;
-  padding: 0.2rem 0.5rem;
+  padding: 0.4em 0.5em;
 }
 
 .quickRepliesButtonContainer {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.5em;
   margin-bottom: 8px;
   flex-wrap: wrap;
 }
@@ -370,9 +374,9 @@
   background: #202020;
   border: 1px solid rgba(var(--color-font-default), 1);
   color: rgba(var(--color-font-default), 1);
-  padding: 0.25rem 0.5rem;
-  font-size: 0.8rem;
-  border-radius: 2rem;
+  padding: 0.25em 0.5em;
+  font-size: 0.8em;
+  border-radius: 2em;
   cursor: pointer;
   align-items: center;
   gap: 6px;
@@ -385,7 +389,16 @@
   color: rgba(var(--color-font-primary), 1);
 }
 
+@media only screen and (max-width: 992px) {
+  /* boosts font size in chatbot */
+  .chatWindow {
+    font-size: 16px;
+  }
+}
+
+
 @media only screen and (max-width: 576px) {
+  /* boosts font size in chatbot, especially on mobile */
   .chatWindow {
     max-height: 100%;
     height: 100vh;
@@ -395,6 +408,7 @@
     top: 0;
     left: 0;
     border-radius: 0;
+    font-size: 18px;
     /* overflow: hidden; */
   }
   .chatHeader {
@@ -402,7 +416,7 @@
   }
 
   .quickRepliesButtonContainer {
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     overflow-x: auto;
     padding: 5px;
   }

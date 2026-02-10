@@ -4,7 +4,9 @@ import { public_env_vars } from "./app/_utils/public_env_vars";
 const auth_enabled = public_env_vars.NEXT_PUBLIC_ENABLE_AUTH;
 
 // const isPublicRoute = createRouteMatcher(['/sign-in(.*)', '/', '/auth'])
-const isPublicRoute = createRouteMatcher([]);
+const isPublicRoute = createRouteMatcher([
+'/api/CMSUpdate' // webhook must be public
+]);
 
 const nothingFunction = (..._: any[]) => {
   // if (auth_enabled) clerkMiddleware(args[0], args[1]);
