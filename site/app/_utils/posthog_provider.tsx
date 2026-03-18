@@ -7,7 +7,7 @@ import { PostHogProvider as PHProvider } from "posthog-js/react";
 import { usePublicEnv } from "../_context/PublicEnvContext/PublicEnvContext";
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
-  const public_env = usePublicEnv();  
+  const public_env = usePublicEnv();
 
   useEffect(() => {
     if (!public_env.NEXT_PUBLIC_ENABLE_RUM) return;

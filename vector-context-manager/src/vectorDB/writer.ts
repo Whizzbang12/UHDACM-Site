@@ -274,7 +274,7 @@ class VectorDBWriter {
             pageURL += "about";
             break;
           case "page-contact":
-            pageURL += "contact";
+            pageURL += "contact-us";
             break;
           case "page-events":
             pageURL += "events";

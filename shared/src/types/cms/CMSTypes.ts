@@ -182,6 +182,7 @@ export interface SplitHeroColumnTextBlock extends SplitHeroColumn {
   textBlock: HeroTextBlock;
 }
 
+
 export interface SplitHeroColumnForm extends SplitHeroColumn {
   type: "form";
   form: {

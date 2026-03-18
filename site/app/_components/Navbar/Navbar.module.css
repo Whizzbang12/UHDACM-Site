@@ -16,13 +16,14 @@
   transition: background-color 0.3s, border 0.3s, transform 0.3s;
   border: 1px solid transparent;
   transform: translateY(1rem) translateX(-50%);
-  backdrop-filter: blur(5px);
+  backdrop-filter: none;
   box-sizing: border-box;
 }
 
 .Navbar.scrolled {
   background-color: rgba(var(--color-neutral-1000), 0.85);
   border: 1px solid rgba(var(--color-stroke-normal), 0.5);
+  backdrop-filter: blur(5px);
   transform: translateY(0.5rem) translateX(-50%);
 }
 

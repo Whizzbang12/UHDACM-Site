@@ -1,0 +1,109 @@
+/* ─── Keyframes ─────────────────────────────────────────────────────────────
+   Individual CSS transform properties (translate, rotate, scale) compose
+   cleanly — multiple animations on one element don't clobber each other.
+
+   --bg-{type}-strength (default 1) scales the effect amplitude:
+     float/drift:      translate distance
+     spin-left/right:  degrees per cycle (1 = 360°, 2 = 720°, 0.5 = 180°)
+     pulse/blink:      opacity swing range
+     grow/shrink-fade: scale delta
+   ────────────────────────────────────────────────────────────────────────── */
+
+@keyframes bgFloat {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 calc(var(--bg-float-strength, 1) * -0.75rem);
+  }
+}
+
+@keyframes bgDrift {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: calc(var(--bg-drift-strength, 1) * 0.875rem) 0;
+  }
+}
+
+@keyframes bgSpinLeft {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: calc(var(--bg-spin-left-strength, 1) * -360deg);
+  }
+}
+
+@keyframes bgSpinRight {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: calc(var(--bg-spin-right-strength, 1) * 360deg);
+  }
+}
+
+@keyframes bgPulse {
+  /* strength=1 → 0.2–1.0; strength=0 → stays at 1; strength=1.25 → 0–1 */
+  0%,
+  100% {
+    opacity: max(0, calc(1 - var(--bg-pulse-strength, 1) * 0.8));
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes bgGrowFade {
+  0% {
+    scale: 1;
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.75;
+  }
+  80%,
+  100% {
+    scale: calc(1 + var(--bg-grow-fade-strength, 1) * 0.65);
+    opacity: 0;
+  }
+}
+
+@keyframes bgShrinkFade {
+  0% {
+    scale: 1;
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.75;
+  }
+  80%,
+  100% {
+    scale: max(0, calc(1 - var(--bg-shrink-fade-strength, 1) * 0.65));
+    opacity: 0;
+  }
+}
+
+@keyframes bgWobble {
+  /* 0%, 100% { rotate: 0deg; } */
+  0%       { rotate: calc(var(--bg-wobble-strength, 1) *  15deg); }
+  50%       { rotate: calc(var(--bg-wobble-strength, 1) * -15deg); }
+  100%       { rotate: calc(var(--bg-wobble-strength, 1) *  15deg); }
+}
+
+@keyframes bgBlink {
+  /* strength=1 → 0.1–0.9; strength=0 → stays at 1 */
+  0%,
+  45%,
+  100% {
+    opacity: max(0, calc(1 - var(--bg-blink-strength, 1) * 0.9));
+  }
+  50%,
+  95% {
+    opacity: min(1, calc(var(--bg-blink-strength, 1) * 0.9));
+  }
+}

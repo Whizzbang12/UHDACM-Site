@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useRef, useEffect } from "react";
 import styles from "./chatbot.module.css";
 
@@ -14,6 +16,7 @@ import { contextMsgLimit } from "@shared/types/query/queryData";
 
 import Link from "next/link";
 import { usePostHog } from "posthog-js/react";
+import ChatbotMarkdownRenderer from "./chatbot-markdown-renderer";
 
 // temporary, seeing how to format msgs (CSS) + scrolling to bottom
 interface QueryMessage extends QueryResponse {
@@ -35,7 +38,6 @@ export default function Chat() {
     try {
       const link = new URL(url);
       const currentOrigin = window.location.origin;
-
       if (link.origin === currentOrigin) {
         return link.pathname + link.search + link.hash;
       }
@@ -49,7 +51,9 @@ export default function Chat() {
   const [messages, setMessages] = useState<QueryMessage[]>([
     {
       sender: "bot",
-      response: "Hey, welcome to UHD ACM! What are you looking for today?",
+      response: `Hey, welcome to **UHD ACM**!
+      
+What are you looking for today?`,
       timestamp: new Date(),
       // just to show "relavent actions" & style since im retrieving nothing
       relevant_actions: [
@@ -110,6 +114,7 @@ export default function Chat() {
     let resMsg = "error";
     let resActions: QueryMessage["relevant_actions"] = [];
     let resQuickReps: QueryMessage["quick_replies"] = [];
+    let resStartTime = Date.now();
     try {
       // adds some of the most recent messages as context.
       const context: QueryMessage[] = [];
@@ -180,13 +185,13 @@ export default function Chat() {
       // }, 2000)
     } finally {
       posthog.capture("sent_message", {
-        msg: message,
+        query: message,
         prev_msg: messages[messages.length - 1].response,
-        res: {
-          resMsg,
-          resActions,
-          resQuickReps,
-        },
+        response: resMsg,
+        responseActions: resActions,
+        responseQuickReplies: resQuickReps,
+        responseTime: Date.now() - resStartTime,
+        href: document.location.href
       });
       setIsLoading(false);
     }
@@ -209,12 +214,16 @@ export default function Chat() {
   const isButtonDisabled = inputValue.trim() === "" || isLoading;
 
   const handleOpening = () => {
-    posthog.capture("opened_chatbot");
+    posthog.capture("opened_chatbot", {
+      href: window.location.href
+    });
     setIsClosing(false);
     setOpenWebChat(true);
   };
   const handleClosing = () => {
-    posthog.capture("closed_chatbot");
+    posthog.capture("closed_chatbot", {
+      href: window.location.href
+    });
     setIsClosing(true);
     setTimeout(() => {
       setOpenWebChat(false);
@@ -280,7 +289,6 @@ export default function Chat() {
     };
   }, []);
 
-
   return (
     <>
       {/*open chat button */}
@@ -320,7 +328,6 @@ export default function Chat() {
                   {formatTime(new Date())}
                 </p>
               </div>
-
               {messages.map((msg, msgIndex) => (
                 <div
                   key={msgIndex}
@@ -333,11 +340,16 @@ export default function Chat() {
                     <span className={styles.messageTime}>
                       {formatTime(msg.timestamp)}
                     </span>
-                    <div
-                      className={`${styles.messageBubble} ${msg.sender === "bot" ? styles.messagesBot : styles.messagesUser}`}
-                    >
-                      <p>{msg.response}</p>
-                    </div>
+                    {msg.sender == "user" && (
+                      <div
+                        className={`${styles.messageBubble} ${styles.messagesUser}`}
+                      >
+                        <p>{msg.response}</p>
+                      </div>
+                    )}
+                    {msg.sender == "bot" && (
+                      <ChatbotMarkdownRenderer children={msg.response} />
+                    )}
 
                     {msg.relevant_actions && (
                       <div className={styles.relevantActions}>
@@ -425,16 +437,18 @@ export default function Chat() {
           {/* quick replies */}
           <div className={styles.quickReplies}>
             <p className={styles.quickRepliesLabel}>Quick Replies</p>
-            {!isLoading && messages.length != 1 && (messages[messages.length - 1].quick_replies.length == 0) && (
-              <p
-                style={{ opacity: 0.5, marginLeft: "0.5rem" }}
-                className={styles.quickRepliesLabel}
-              >
-                None
-              </p>
-            )}
+            {!isLoading &&
+              messages.length != 1 &&
+              messages[messages.length - 1].quick_replies.length == 0 && (
+                <p
+                  style={{ opacity: 0.5, marginLeft: "0.5rem" }}
+                  className={styles.quickRepliesLabel}
+                >
+                  None
+                </p>
+              )}
             {isLoading && (
-              <div style={{marginLeft: '1em'}} className={styles.loadingDots}>
+              <div style={{ marginLeft: "1em" }} className={styles.loadingDots}>
                 <div className={styles.dot} />
                 <div className={styles.dot} />
                 <div className={styles.dot} />

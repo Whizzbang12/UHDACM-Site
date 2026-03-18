@@ -4,7 +4,6 @@ import React from "react";
 import Link from "next/link";
 import { FunctionUnknown } from "@shared/types/general/generalTypes";
 import styles from "./Button.module.css";
-import { usePostHog } from "posthog-js/react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   onClick?: FunctionUnknown;
@@ -29,8 +28,6 @@ const Button: React.FC<ButtonProps> = ({
   className,
   ...props
 }) => {
-  const posthog = usePostHog();
-
   const classes = [defaultProps.className, styles[className || ""]]
     .filter(Boolean)
     .join(" ");

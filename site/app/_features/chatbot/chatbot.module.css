@@ -50,7 +50,7 @@
   position: fixed;
   bottom: 24px;
   right: 24px;
-  width: 380px;
+  width: 24rem;
   height: 600px;
   background-color: #181818;
   border-radius: 16px;
@@ -165,6 +165,10 @@
   flex-direction: column;
   padding: 10px;
   max-width: 65%;
+}
+
+.botWrapper .messageGroup {
+  max-width: 100%;
 }
 
 .userWrapper .messageGroup {

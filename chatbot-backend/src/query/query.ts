@@ -150,7 +150,7 @@ export const processQuery = async (query: string, context?: QueryMessage[]) => {
   - Arrays may be empty if no items are appropriate.
   - Do NOT invent links, or facts.
   - You may invent actions (not links) if it is convenient for the user.
-  - Use plain text only (no HTML).
+  - Use markdown.
   - If they ask about an event, gallery, etc., provide a link action.
 
   JSON SCHEMA:
