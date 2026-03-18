@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
   //   // TODO: stop ignoring builds eslin in build
   //   ignoreDuringBuilds: true,
   // }
-  outputFileTracingRoot: '/site'
+  // outputFileTracingRoot: '/site'
 };
 
 export default nextConfig;
