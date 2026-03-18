@@ -1,0 +1,92 @@
+/*accent*/
+
+.orangeHover:hover{
+ background:rgba(249,115,22,0.1);   
+}
+.orangeIconBg{
+    background:rgba(249,115,22,0.15);
+}
+.orangeIconClr{
+    color:rgb(249,115,22)
+}
+.orangeCircle{
+    background: rgba(249,115,22,0.03);
+}
+
+.blueHover:hover{
+    background:rgba(59, 130, 246,0.1);
+}
+.blueIconBg{
+    background:rgba(59, 130, 246,0.15);
+}
+.blueIconClr{
+    color:rgb(59, 130, 246)
+}
+.blueCircle{
+    background: rgba(59, 130, 246,0.03);
+}
+
+.card{
+    position:relative;
+    display:flex;
+    flex-direction: column;
+    padding:1.5rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(255,255,255,0.1);
+    cursor:pointer;
+    backdrop-filter: blur(12px);
+    background: rgba(39,39,42,0.3);
+    transition: all 0.5s;
+    text-align: left;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+}
+
+.circle{
+    position:absolute;
+    top:0;
+    right:0;
+    width:5rem;
+    height:5rem;
+    border-bottom-left-radius: 100000px;
+}
+
+.iconBox{
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius:  0.75rem;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.title{
+    color:white;
+    font-weight: 600;
+    font-size: 1.25rem ;
+    margin-bottom: 0.5rem;
+}
+.description{
+    color:rgba(225,255,255,0.65);
+    font-size:1rem;
+}
+
+.CardRow{
+    display:grid;
+    grid-template-columns: 1fr;
+    gap:1.25rem;
+    
+}
+
+@media (min-width:640px){
+    .CardRow{
+        grid-template-columns: repeat(2,1fr) ;
+
+    }
+}
+
+@media (min-width:1024px){
+    .CardRow{
+        grid-template-columns: repeat(4,1fr);
+    }
+}
