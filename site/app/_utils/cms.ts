@@ -32,6 +32,14 @@ export async function fetchCMS(
     });
     if (!res.ok) {
       console.log("!!!!!!!!!!error!!!!!!!!!!\n", res);
+      console.log({
+        Authorization: `Bearer ${private_env_vars.STRAPI_API_TOKEN}`,
+      });
+      try {
+        console.log(await res.text());
+      } catch {
+        console.log('could not print text');
+      }
       throw new Error(`Failed to fetch API: ${path}`);
     }
     const data = await res.json();
