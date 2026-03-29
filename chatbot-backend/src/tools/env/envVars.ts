@@ -40,6 +40,10 @@ export const env_vars = {
   ENABLE_LOGGER: pe.ENABLE_LOGGER == "true",
   COLLECTOR_SOURCE_SECRET: pe.COLLECTOR_SOURCE_SECRET!,
   COLLECTOR_INGESTING_HOST: pe.COLLECTOR_INGESTING_HOST!,
+
+  AUTH_COOKIE_REQUIRED: pe.AUTH_COOKIE_REQUIRED == "true",
+  AUTH_COOKIE_JWT_SECRET: pe.AUTH_COOKIE_JWT_SECRET!,
+  AUTH_COOKIE_TURNSTILE_SECRET: pe.AUTH_COOKIE_TURNSTILE_SECRET!
 } as const;
 
 for (const [key, val] of Object.entries(env_vars)) {
@@ -69,6 +73,10 @@ for (const [key, val] of Object.entries(env_vars)) {
       tKey == "CHROMA_DATABASE_NAME"
     ) {
       if (!env_vars.CHROMA_IS_CLOUD) continue; // allowed if not using cloud client
+    }
+
+    if (tKey == 'AUTH_COOKIE_JWT_SECRET' || tKey == 'AUTH_COOKIE_TURNSTILE_SECRET') {
+      if (!env_vars.AUTH_COOKIE_REQUIRED) continue; // allowed if auth cookie is not required
     }
 
     const err = `Expected environment variable \"${key}\" to be defined`;

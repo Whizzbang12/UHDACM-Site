@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import SplitHeroSection from "../_sections/SplitHeroSection/SplitHeroSection";
 import { SplitHeroColumnSingleImage, SplitHeroColumnTextBlock } from "@shared/types/cms/CMSTypes";
+import Chatbot from "../_features/chatbot/chatbot";
 
 export default function PlaygroundPage() {
   if (process.env.NODE_ENV === "production") {
@@ -39,48 +40,54 @@ export default function PlaygroundPage() {
 
   return (
     <div>
-      <SplitHeroSection
-        // leftComponent={compL}
-        rightComponent={compR}
-        centerIfPossible={true}
-        reverseOnDesktop={false}
-        reverseOnMobile={false}
-        sectionID={""}
-      />
-      <SplitHeroSection
-        // leftComponent={compL}
-        rightComponent={compR}
-        centerIfPossible={true}
-        reverseOnDesktop={false}
-        reverseOnMobile={false}
-        sectionID={""}
-      />
-      <SplitHeroSection
-        // leftComponent={compL}
-        rightComponent={compR}
-        centerIfPossible={true}
-        reverseOnDesktop={false}
-        reverseOnMobile={false}
-        sectionID={""}
-      />
-      <SplitHeroSection
-        // leftComponent={compL}
-        rightComponent={compR}
-        centerIfPossible={true}
-        reverseOnDesktop={false}
-        reverseOnMobile={false}
-        sectionID={""}
-      />
-      <SplitHeroSection
-        // leftComponent={compL}
-        rightComponent={compR}
-        centerIfPossible={true}
-        reverseOnDesktop={false}
-        reverseOnMobile={false}
-        sectionID={""}
-      />
+      <Chatbot />
     </div>
-  );
+  )
+
+  // return (
+  //   <div>
+  //     <SplitHeroSection
+  //       // leftComponent={compL}
+  //       rightComponent={compR}
+  //       centerIfPossible={true}
+  //       reverseOnDesktop={false}
+  //       reverseOnMobile={false}
+  //       sectionID={""}
+  //     />
+  //     <SplitHeroSection
+  //       // leftComponent={compL}
+  //       rightComponent={compR}
+  //       centerIfPossible={true}
+  //       reverseOnDesktop={false}
+  //       reverseOnMobile={false}
+  //       sectionID={""}
+  //     />
+  //     <SplitHeroSection
+  //       // leftComponent={compL}
+  //       rightComponent={compR}
+  //       centerIfPossible={true}
+  //       reverseOnDesktop={false}
+  //       reverseOnMobile={false}
+  //       sectionID={""}
+  //     />
+  //     <SplitHeroSection
+  //       // leftComponent={compL}
+  //       rightComponent={compR}
+  //       centerIfPossible={true}
+  //       reverseOnDesktop={false}
+  //       reverseOnMobile={false}
+  //       sectionID={""}
+  //     />
+  //     <SplitHeroSection
+  //       // leftComponent={compL}
+  //       rightComponent={compR}
+  //       centerIfPossible={true}
+  //       reverseOnDesktop={false}
+  //       reverseOnMobile={false}
+  //       sectionID={""}
+  //     />
+  //   </div>
+  // );
 
   // const compL: SplitHeroColumnSingleImage = {
   //   type: "singleImage",

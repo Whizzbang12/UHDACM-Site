@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useState, useRef, useEffect } from "react";
 import styles from "./chatbot.module.css";
@@ -17,6 +17,10 @@ import { contextMsgLimit } from "@shared/types/query/queryData";
 import Link from "next/link";
 import { usePostHog } from "posthog-js/react";
 import ChatbotMarkdownRenderer from "./chatbot-markdown-renderer";
+import {
+  rateLimitHourError,
+  rateLimitMinuteError,
+} from "@shared/types/rate_limiting/rateLimitingData";
 
 // temporary, seeing how to format msgs (CSS) + scrolling to bottom
 interface QueryMessage extends QueryResponse {
@@ -26,12 +30,28 @@ interface QueryMessage extends QueryResponse {
 
 const logoPNG = "/Logo.png";
 
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (
+        container: HTMLElement,
+        options: {
+          sitekey: string;
+          callback: (token: string) => void;
+          "error-callback"?: () => void;
+        },
+      ) => string;
+      reset: (widgetId: string) => void;
+    };
+  }
+}
+
 export default function Chat() {
   const posthog = usePostHog();
 
   const dispatch = useDispatch();
   const public_env = usePublicEnv();
-  const [isOpenWebChat, setOpenWebChat] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
 
   const getLinkPath = (url: string): string => {
@@ -79,6 +99,122 @@ What are you looking for today?`,
       ],
     },
   ]);
+
+  // auth part.
+  // user requires an auth cookie.
+  // its used on the backend to identify which user is making the request
+  // its protected via cloudflare turnstile to ensure the user is not a bot.
+  const [authenticated, setAuthenticated] = useState<
+    boolean | undefined | "authenticating"
+  >(undefined);
+  const turnstileRef = useRef<HTMLDivElement>(null);
+  const widgetIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    // sends quick request to backend to check auth status
+    if (authenticated != undefined) return;
+    if (isOpen != true) return;
+    if (!turnstileRef.current) return;
+
+    const main = async () => {
+      const authStatus = await getAuthStatus();
+      if (!authStatus) {
+        // make fetch request to get auth cookie
+
+        console.log("not authed, getting auth token");
+        if (!public_env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE) {
+          // skip getting auth token if cloudflare turnstile env is not defined
+
+          console.log("no cloudflare turnstile, skipping");
+          return setAuthenticated(true);
+        }
+
+        if (window.turnstile) {
+          authWithTurnstile();
+        } else {
+          console.log("no turnstile in window, waiting...");
+          const interval = setInterval(() => {
+            if (window.turnstile) {
+              clearInterval(interval);
+              authWithTurnstile();
+            } else {
+              console.log("nothing...");
+            }
+          }, 100);
+          return () => clearInterval(interval);
+        }
+      } else {
+        setAuthenticated(true);
+      }
+    };
+
+    const authWithTurnstile = () => {
+      console.log("authing with turnstile");
+      if (!window.turnstile || !turnstileRef.current) return;
+
+      setAuthenticated("authenticating");
+      widgetIdRef.current = window.turnstile.render(turnstileRef.current, {
+        sitekey: public_env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE,
+        callback: async (token: string) => {
+          console.log("fetching auth token");
+          try {
+            const res = await fetch(
+              `${public_env.NEXT_PUBLIC_CHATBOT_ENDPOINT}/auth`,
+              {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                  "x-turnstile-token": token,
+                  "Content-Type": "application/json",
+                },
+              },
+            );
+            const data = (await res.json()) as { error?: string };
+            console.log("auth daa", data);
+            if (res.ok) {
+              console.log("authenticaed");
+              setAuthenticated(true);
+            } else {
+              alert(data.error ?? "Authentication failed");
+              // if (widgetIdRef.current)
+              //   window.turnstile?.reset(widgetIdRef.current);
+            }
+          } catch (e) {
+            alert(`Failed to authenticate: ${(e as Error).message}`);
+            // if (widgetIdRef.current)
+            //   window.turnstile?.reset(widgetIdRef.current);
+          }
+        },
+        "error-callback": () => {
+          alert("Turnstile challenge failed. Please try again.");
+        },
+      });
+    };
+
+    const getAuthStatus = async () => {
+      if (!public_env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE) return true;
+      try {
+        const response = await (
+          await fetch(public_env.NEXT_PUBLIC_CHATBOT_ENDPOINT + "/chat", {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              cookieAuthCheck: true,
+            }),
+          })
+        ).json();
+        const { success, error } = response;
+        console.log("auth status", success, error);
+        return success == true;
+      } catch {
+        return false;
+      }
+    };
+
+    main();
+  }, [authenticated, isOpen]);
 
   // CHATBOT PART!
   // scrolls down when new messages are sent
@@ -128,20 +264,64 @@ What are you looking for today?`,
         }
       }
 
-      const response = await fetch(public_env.NEXT_PUBLIC_CHATBOT_ENDPOINT, {
-        method: "POST",
-        headers: {
-          whatever: "whatever",
-          "Content-Type": "application/json",
+      const response = await fetch(
+        public_env.NEXT_PUBLIC_CHATBOT_ENDPOINT + "/chat",
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            query: message,
+            context: context,
+          }),
         },
-        body: JSON.stringify({
-          query: message,
-          context: context,
-        }),
-      });
+      );
 
       const data = await response.json();
-      const { response: query_response } = data;
+
+      const { response: query_response, error } = data;
+
+      if (error) {
+        if (error == rateLimitMinuteError) {
+          return setMessages((prev) => [
+            ...prev,
+            {
+              sender: "bot",
+              response: "# Too many messages!\nYou've sent the max number of messages this minute.\n\n**Please wait one minute before sending your next message**",
+              timestamp: new Date(),
+              quick_replies: [],
+              relevant_actions: [],
+            },
+          ]);
+        } else if (error == rateLimitMinuteError) {
+          return setMessages((prev) => [
+            ...prev,
+            {
+              sender: "bot",
+              response: "# Too many messages!\nYou've sent the max number of messages this hour.\n\n**Please wait one hour before sending your next message**",
+              timestamp: new Date(),
+              quick_replies: [],
+              relevant_actions: [],
+            },
+          ]);
+        } else if (response.status == 429) {
+          return setMessages((prev) => [
+            ...prev,
+            {
+              sender: "bot",
+              response: "# Too many messages!\nYou're sending requests too quickly.\n\n**Please wait ~10 seconds before sending your next message**",
+              timestamp: new Date(),
+              quick_replies: [],
+              relevant_actions: [],
+            },
+          ]);
+        } else {
+          throw new Error(); // to enter catch state
+        }
+      }
+
       checkQueryResponse(query_response);
 
       setMessages((prev) => [
@@ -191,7 +371,7 @@ What are you looking for today?`,
         responseActions: resActions,
         responseQuickReplies: resQuickReps,
         responseTime: Date.now() - resStartTime,
-        href: document.location.href
+        href: document.location.href,
       });
       setIsLoading(false);
     }
@@ -215,18 +395,18 @@ What are you looking for today?`,
 
   const handleOpening = () => {
     posthog.capture("opened_chatbot", {
-      href: window.location.href
+      href: window.location.href,
     });
     setIsClosing(false);
-    setOpenWebChat(true);
+    setIsOpen(true);
   };
   const handleClosing = () => {
     posthog.capture("closed_chatbot", {
-      href: window.location.href
+      href: window.location.href,
     });
     setIsClosing(true);
     setTimeout(() => {
-      setOpenWebChat(false);
+      setIsOpen(false);
       setIsClosing(false);
     }, 300);
   };
@@ -261,7 +441,7 @@ What are you looking for today?`,
   // disable scrolling in chatbot when on mobile
   // also auto scrolls to bottom
   useEffect(() => {
-    if (isOpenWebChat) {
+    if (isOpen) {
       dispatch(setChatbotDisableScrollOnMobile(true));
     } else {
       dispatch(setChatbotDisableScrollOnMobile(false));
@@ -271,7 +451,7 @@ What are you looking for today?`,
     return () => {
       dispatch(setChatbotDisableScrollOnMobile(true));
     };
-  }, [isOpenWebChat]);
+  }, [isOpen]);
 
   const screenWidthRef = useRef<number | null>(null);
 
@@ -292,14 +472,14 @@ What are you looking for today?`,
   return (
     <>
       {/*open chat button */}
-      {!isOpenWebChat && (
+      {!isOpen && (
         <button onClick={handleOpening} className={styles.toggleButton}>
           <HiOutlineSparkles size={30} strokeWidth={1} />
         </button>
       )}
 
       {/* actual chat window */}
-      {isOpenWebChat && (
+      {isOpen && (
         <div
           className={`${styles.chatWindow} ${isClosing ? styles.chatWindowClose : styles.chatWindowOpen}`}
         >
@@ -414,24 +594,38 @@ What are you looking for today?`,
 
           {/* input area*/}
           <div className={styles.inputArea}>
-            <div className={styles.inputWrapper}>
-              <input
-                ref={inputRef}
-                type="text"
-                placeholder="Ask me anything"
-                className={styles.chatInput}
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={handleEnterPress}
+            {authenticated == true && (
+              <div className={styles.inputWrapper}>
+                <input
+                  ref={inputRef}
+                  type="text"
+                  placeholder="Ask me anything"
+                  className={styles.chatInput}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyUp={handleEnterPress}
+                  // onKeyPress={}
+                />
+                <button
+                  className={styles.sendButton}
+                  onClick={handleSendClick}
+                  disabled={isButtonDisabled}
+                >
+                  <LuSend style={{ width: "100%", height: "100%" }} />
+                </button>
+              </div>
+            )}
+            {authenticated != true && (
+              <div
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+                ref={turnstileRef}
               />
-              <button
-                className={styles.sendButton}
-                onClick={handleSendClick}
-                disabled={isButtonDisabled}
-              >
-                <LuSend style={{ width: "100%", height: "100%" }} />
-              </button>
-            </div>
+            )}
           </div>
 
           {/* quick replies */}

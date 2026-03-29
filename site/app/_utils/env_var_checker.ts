@@ -18,7 +18,10 @@ for (const key of Object.keys(total_env)) {
       if (!total_env.NEXT_PUBLIC_ENABLE_AUTH) continue;
     } else if (mKey == 'NEXT_PUBLIC_POSTHOG_KEY' || mKey == 'NEXT_PUBLIC_POSTHOG_HOST') {
       if (!total_env.NEXT_PUBLIC_ENABLE_RUM) continue;
-    }
+    } 
+    
+    // or check if any values are okay being undefined
+    if (mKey == 'NEXT_PUBLIC_CLOUDFLARE_TURNSTILE') continue;
     
     console.error(private_env_vars);
     throw new Error(`${key} should be defined`);

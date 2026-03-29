@@ -39,6 +39,14 @@ CHROMA_DATABASE_NAME=<get-ur-own-db>
 ENABLE_LOGGER=false
 COLLECTOR_SOURCE_SECRET=<secret>
 COLLECTOR_INGESTING_HOST=<https-host>
+
+
+# if auth_cookie required, it will prevent requests to chat without auth cookie
+AUTH_COOKIE_REQUIRED=false,
+AUTH_COOKIE_JWT_SECRET=<insert_secret>
+AUTH_COOKIE_TURNSTILE_SECRET=<insert_cloudflare_turnstile_secret>
+
+
 ```
 
 - `GOOGLE_API_KEYS`: Comma-separated list of Google API keys.

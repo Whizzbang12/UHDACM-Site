@@ -23,7 +23,8 @@ NEXT_PUBLIC_ENABLE_RUM=false
 NEXT_PUBLIC_POSTHOG_KEY=<ph-key>
 NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
 
-NEXT_PUBLIC_CHATBOT_ENDPOINT=http://localhost:4000/chat
+NEXT_PUBLIC_CHATBOT_ENDPOINT=http://localhost:4000
+# NEXT_PUBLIC_CLOUDFLARE_TURNSTILE=<only-use-in-prod>
 ```
 
 The Strapi API token is obtainable through the StrapiCMS (Set that up first)

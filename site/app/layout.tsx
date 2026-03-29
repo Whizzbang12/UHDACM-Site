@@ -38,6 +38,11 @@ export default function RootLayout({
 
   return (
     <html lang="en">
+      <script
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+        async
+        defer
+      ></script>
       <link rel="favicon_io/manifest" href="favicon_io/site.webmanifest" />
       <PublicEnvProvider env={public_env_vars}>
         <AuthWrapper>

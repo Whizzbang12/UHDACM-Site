@@ -68,6 +68,10 @@ app.use(express.json());
     }
 });
 
+app.get('/status', (_, res) => {
+  res.send({ status: 'online' });
+});
+
 app.listen(env_vars.PORT, () => {
   console.log(`Server is running on port ${env_vars.PORT}`);
 });
