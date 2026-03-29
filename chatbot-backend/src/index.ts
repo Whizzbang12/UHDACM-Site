@@ -10,6 +10,7 @@ import * as jwt from "jsonwebtoken";
 import { sleep } from "@shared/tools";
 import { rateLimitHourError, rateLimitMinuteError } from "@shared/types/rate_limiting/rateLimitingData";
 
+console.log('v0.5', `mode=${process.env.NODE_ENV}`);
 const app = express();
 const PORT = env_vars.PORT;
 const FRONTEND_ADDRESS = env_vars.FRONTEND_ADDRESS;
@@ -120,7 +121,7 @@ async function rateLimitMiddleware(
   res: Response,
   next: NextFunction,
 ) {
-  console.log('rating...', req.cookies);
+  console.log('rating...', JSON.stringify(req.cookies, null, 2));
   const token = req.cookies?.auth_token as string | undefined;
 
   if (!token) {
@@ -301,7 +302,7 @@ app.post("/auth", async (req: Request, res: Response) => {
   res.cookie("auth_token", authToken, {
     httpOnly: true,
     secure: isProd,
-    sameSite: isProd ? "strict" : "lax",
+    sameSite: "lax",
     maxAge: 60 * 60 * 1000, // 1 hour
   });
 
