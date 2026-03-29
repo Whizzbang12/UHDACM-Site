@@ -140,8 +140,8 @@ async function rateLimitMiddleware(
   const ip = req.ip || req.socket.remoteAddress || "unknown";
   const ua = req.headers["user-agent"] || "unknown";
 
-  const COOKIE_MIN_MAX = 1;
-  const COOKIE_HOUR_MAX = 2;
+  const COOKIE_MIN_MAX = 6;
+  const COOKIE_HOUR_MAX = 12;
 
   let spamDelay = 0;
 
@@ -170,10 +170,10 @@ async function rateLimitMiddleware(
     rateLimitStores.ipPerHour,
     ip,
   );
-  if (ipCounts.minute > 30) {
+  if (ipCounts.minute > COOKIE_MIN_MAX * 5) {
     return res.status(429).json({ error: rateLimitMinuteError });
   }
-  if (ipCounts.hour > 90) {
+  if (ipCounts.hour > COOKIE_HOUR_MAX * 5) {
     res.status(429).json({ error: rateLimitHourError });
     return;
   }
@@ -183,11 +183,11 @@ async function rateLimitMiddleware(
     rateLimitStores.uaPerHour,
     ua,
   );
-  if (uaCounts.minute > 60) {
+  if (uaCounts.minute > COOKIE_MIN_MAX * 20) {
     res.status(429).json({ error: rateLimitMinuteError });
     return;
   }
-  if (uaCounts.hour > 180) {
+  if (uaCounts.hour > COOKIE_HOUR_MAX * 20) {
     res.status(429).json({ error: rateLimitHourError });
     return;
   }
