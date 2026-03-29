@@ -302,8 +302,9 @@ app.post("/auth", async (req: Request, res: Response) => {
   res.cookie("auth_token", authToken, {
     httpOnly: true,
     secure: isProd,
-    sameSite: "lax",
-    maxAge: 60 * 60 * 1000, // 1 hour
+    sameSite: "none",
+    maxAge: 60 * 60 * 1000, // 1 hour,
+    path: "/"
   });
 
   res.json({ success: true });
