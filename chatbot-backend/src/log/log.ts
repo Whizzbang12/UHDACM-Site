@@ -2,6 +2,10 @@ import { LogMessageToBetterStack } from "@shared/log/logFuncs";
 import { env_vars } from "../tools/env/envVars";
 
 export async function LogMessage(message: string, metadata?: Object) {
+  if (!env_vars.ENABLE_LOGGER) {
+    console.log('LogMessage:', message, metadata);
+    return;
+  }
   return await LogMessageToBetterStack({
     enable: env_vars.ENABLE_LOGGER,
     ingesting_host: env_vars.COLLECTOR_INGESTING_HOST,

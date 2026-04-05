@@ -23,7 +23,8 @@ app.get("/health_check", (_, res) => {
 });
 
 const allowedOrigins = [FRONTEND_ADDRESS];
-app.use(cors({ origin: allowedOrigins }));
+// app.use(cors({ origin: allowedOrigins }));
+app.use(cors({ origin: "*"}));
 
 // app.use((req: Request, res: Response, next) => {
 //   const origin = req.headers.origin;
@@ -43,16 +44,18 @@ app.post(
 
       // console.log('cias', context);
       const validContext: QueryMessage[] = [];
-      for (const msg of context) {
-        try {
-          checkQueryMessage(msg);
-          validContext.push(msg);
-        } catch (e) {
-          LogMessage((e as Error).message, {
-            file: "index.ts",
-            path: "/chat",
-            msg: msg,
-          });
+      if (Array.isArray(context)) {
+        for (const msg of context) {
+          try {
+            checkQueryMessage(msg);
+            validContext.push(msg);
+          } catch (e) {
+            LogMessage((e as Error).message, {
+              file: "index.ts",
+              path: "/chat",
+              msg: msg,
+            });
+          }
         }
       }
 

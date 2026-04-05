@@ -5,7 +5,7 @@
     "queryTest": "nodemon --exec ts-node -r tsconfig-paths/register ./src/query/queryTest.ts",
     "start": "node ./dist/chatbot-backend/src",
     "setup-shared": "cd ../shared && npm i",
-    "build": "if exist dist rmdir /s /q dist && npm i && npm run setup-shared && tsc -b && tsc-alias",
+    "build": "npm i && npm run setup-shared && tsc -b && tsc-alias",
     "test": "vitest",
     "chroma-server": "chroma run",
     "ingestTest": "nodemon --exec ts-node -r tsconfig-paths/register ./src/context/ingester.ts",

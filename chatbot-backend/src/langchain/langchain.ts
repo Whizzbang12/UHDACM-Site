@@ -68,37 +68,46 @@ let mcpClient: Client | null = null;
 let mcpTools: DynamicStructuredTool[] = [];
 
 async function initializeMCP() {
-  if (mcpClient) return; 
+  try{
+    if (mcpClient) return; 
 
-  const transport = new StdioClientTransport({
-    command: "node",
-    args: ["./dist-mcp/chatbot-backend/src/MCPServer.js"],
-  });
-
-  mcpClient = new Client({ name: "uhd-acm-client", version: "1.0.0" }, { capabilities: {} });
-  await mcpClient.connect(transport);
-
-  const { tools } = await mcpClient.listTools();
-
-  mcpTools = tools.map((t) => {
-    return new DynamicStructuredTool({
-      name: t.name,
-      description: t.description || "", 
-      schema: z.object({ query: z.string().describe("The search query") }),
-      func: async ({ query }) => {
-        const result = await mcpClient!.callTool({
-          name: t.name,
-          arguments: { query },
-        });
-        return (result as any).content[0]?.text || "No results found.";
-      },
+    const transport = new StdioClientTransport({
+      command: "node",
+      args: ["./dist/chatbot-backend/src/MCPServer.js"],
     });
-  });
+
+    mcpClient = new Client({ name: "uhd-acm-client", version: "1.0.0" }, { capabilities: {} });
+    await mcpClient.connect(transport);
+
+    const { tools } = await mcpClient.listTools();
+
+    mcpTools = tools.map((t) => {
+      return new DynamicStructuredTool({
+        name: t.name,
+        description: t.description || "", 
+        schema: z.object({ query: z.string().describe("The search query") }),
+        func: async ({ query }) => {
+          const result = await mcpClient!.callTool({
+            name: t.name,
+            arguments: { query },
+          });
+          return (result as any).content[0]?.text || "No results found.";
+        },
+      });
+    });
+  } catch (err) {
+    await LogMessage("Error initializing MCP client", {
+      function: 'initializeMCP',
+      error: getErrorMessage(err)
+    });
+    throw new Error("\n \nRun npm run build\n You need the dist folder to be built before starting the server. \n \n");
+  }
 }
+
+initializeMCP() 
 
 export async function handleQuestion(question: string): Promise<string> {
   let lastErr: unknown = null;
-  await initializeMCP();
   console.log("working on it");
   const systemInstruction = `You are the official UHD ACM (Association for Computing Machinery) chatbot. 
   Your sole purpose is to assist students with questions about the UHD ACM club, its events, officers, and computer science topics. 
